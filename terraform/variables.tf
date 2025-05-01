@@ -6,3 +6,41 @@ variable "github_token" {
   type        = string
   sensitive   = true
 }
+
+variable "repositories" {
+  description = "Map of repositories to manage"
+  type = map(object({
+    name        = string
+    description = string
+    visibility  = string
+    is_template = bool
+    template = object({
+      repository = string
+    })
+  }))
+  default = {
+    "cursor" = {
+      name        = "template-cursor"
+      description = "Cursor repository created from template"
+      visibility  = "public"
+      is_template = false
+      template = {
+        repository = "template-template"
+      }
+    }
+  }
+}
+
+variable "repository_settings" {
+  description = "Default settings for all repositories"
+  type = object({
+    has_issues   = bool
+    has_projects = bool
+    has_wiki     = bool
+  })
+  default = {
+    has_issues   = false
+    has_projects = false
+    has_wiki     = false
+  }
+}

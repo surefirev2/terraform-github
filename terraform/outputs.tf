@@ -1,10 +1,10 @@
 # outputs.tf
-output "repository_url" {
-  description = "URL of the created cursor repository"
-  value       = github_repository.cursor.html_url
+output "repository_urls" {
+  description = "URLs of the created repositories"
+  value       = { for k, v in github_repository.repos : k => v.html_url }
 }
 
-output "repository_name" {
-  description = "Name of the created cursor repository"
-  value       = github_repository.cursor.full_name
+output "repository_names" {
+  description = "Names of the created repositories"
+  value       = { for k, v in github_repository.repos : k => v.full_name }
 }
