@@ -22,6 +22,7 @@ terraform {
 
 provider "github" {
   owner = "surefirev2"
+  token = var.github_token
 }
 
 resource "github_repository" "cursor" {
