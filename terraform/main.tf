@@ -25,17 +25,39 @@ provider "github" {
   token = var.github_token
 }
 
-resource "github_repository" "cursor" {
-  name        = "template-cursor"
-  description = "Cursor repository created from template"
-  visibility  = "public"
+# Create organization-wide branch protection
+resource "github_branch_protection" "default_branch" {
+  for_each = var.repositories
 
-  template {
-    owner      = "surefirev2"
-    repository = "template-template"
+  repository_id = github_repository.repos[each.key].node_id
+  pattern       = "main"
+
+  required_status_checks {
+    strict   = true
+    contexts = ["pre-commit"]
   }
 
-  has_issues   = false
-  has_projects = false
-  has_wiki     = false
+  enforce_admins = true
+}
+
+# Create and manage repositories
+resource "github_repository" "repos" {
+  for_each = var.repositories
+
+  name        = each.value.name
+  description = each.value.description
+  visibility  = each.value.visibility
+  is_template = each.value.is_template
+
+  dynamic "template" {
+    for_each = each.value.template.repository != "" ? [each.value.template] : []
+    content {
+      owner      = "surefirev2"
+      repository = template.value.repository
+    }
+  }
+
+  has_issues   = var.repository_settings.has_issues
+  has_projects = var.repository_settings.has_projects
+  has_wiki     = var.repository_settings.has_wiki
 }
