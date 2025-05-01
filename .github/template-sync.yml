@@ -1,0 +1,9 @@
+additional:
+  - "terraform-*"
+
+files:
+  - "!.gitignore"
+  - "!.github/template-sync.yml"
+  - "!.github/dependabot.yml"
+  - "!.github/workflows/sync.yaml"
+  - "!*terraform/*"
