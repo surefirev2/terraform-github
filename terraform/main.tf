@@ -7,9 +7,34 @@ terraform {
     unlock_method  = "DELETE"
     username       = "surefirev2/template-1-terraform"
   }
+
+  required_providers {
+    github = {
+      source  = "integrations/github"
+      version = "~> 5.0"
+    }
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2.5"
+    }
+  }
 }
 
-resource "local_file" "hello_world" {
-  content  = "Hello, World!"
-  filename = "${path.module}/hello_world.txt"
+provider "github" {
+  owner = "surefirev2"
+}
+
+resource "github_repository" "cursor" {
+  name        = "template-cursor"
+  description = "Cursor repository created from template"
+  visibility  = "public"
+
+  template {
+    owner      = "surefirev2"
+    repository = "template-template"
+  }
+
+  has_issues   = false
+  has_projects = false
+  has_wiki     = false
 }

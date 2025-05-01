@@ -1,4 +1,10 @@
 # outputs.tf
-output "hello_world_file" {
-  value = local_file.hello_world.filename
+output "repository_url" {
+  description = "URL of the created cursor repository"
+  value       = github_repository.cursor.html_url
+}
+
+output "repository_name" {
+  description = "Name of the created cursor repository"
+  value       = github_repository.cursor.full_name
 }
