@@ -23,7 +23,7 @@ variable "repositories" {
       name        = "template-cursor"
       description = "Cursor repository created from template"
       visibility  = "public"
-      is_template = false
+      is_template = true
       template = {
         repository = "template-template"
       }
