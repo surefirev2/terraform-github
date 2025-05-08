@@ -12,7 +12,12 @@ sed -i "s|GITHUB_PAT=.*|GITHUB_PAT=$GITHUB_TOKEN|" .env
 
 echo "Migrating .template scripts in mcp_scripts to .sh and replacing token placeholders..."
 for template in mcp_scripts/*.template; do
-  shfile="${template%.template}.sh"
+  base="$(basename "$template" .template)"
+  shfile="mcp_scripts/${base}"
+  # Ensure the output ends with .sh, but not .sh.sh
+  if [[ "$shfile" != *.sh ]]; then
+    shfile="${shfile}.sh"
+  fi
   sed "s|__GITHUB_TOKEN_PLACEHOLDER__|$GITHUB_TOKEN|g" "$template" > "$shfile"
   chmod +x "$shfile"
   echo "Created $shfile from $template"
