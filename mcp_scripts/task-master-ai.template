@@ -1,0 +1,1 @@
+ANTHROPIC_API_KEY=__ANTHROPIC_API_KEY_PLACEHOLDER__ npx -y --package=task-master-ai task-master-ai
