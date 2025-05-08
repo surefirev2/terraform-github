@@ -1,0 +1,10 @@
+{
+    "mcpServers": {
+      "github": {
+        "command": "bash",
+        "args": [
+          "./mcp_scripts/github-mcp.sh"
+        ]
+      }
+    }
+  }
