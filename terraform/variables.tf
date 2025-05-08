@@ -28,6 +28,15 @@ variable "repositories" {
         repository = "template-template"
       }
     }
+    "nuxt-ucda" = {
+      name        = "nuxt-ucda"
+      description = "UCDA Nuxt repository created from template-cursor"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-cursor"
+      }
+    }
   }
 }
 
