@@ -27,7 +27,7 @@ provider "github" {
 
 # Create organization-wide branch protection
 resource "github_branch_protection" "default_branch" {
-  for_each = var.repositories
+  for_each = { for k, v in var.repositories : k => v if v.visibility != "private" }
 
   repository_id = github_repository.repos[each.key].node_id
   pattern       = "main"
