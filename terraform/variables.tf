@@ -37,6 +37,15 @@ variable "repositories" {
         repository = "template-cursor"
       }
     }
+    "invoice-x12-converter" = {
+      name        = "invoice-x12-converter"
+      description = "Invoice to X12 repository created from template-cursor"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-cursor"
+      }
+    }
   }
 }
 
