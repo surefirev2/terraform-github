@@ -5,7 +5,7 @@ terraform {
     unlock_address = "https://api.tfstate.dev/github/v1/lock"
     lock_method    = "PUT"
     unlock_method  = "DELETE"
-    username       = "surefirev2/template-1-terraform"
+    username       = "surefirev2/terraform-github"
   }
 
   required_providers {
