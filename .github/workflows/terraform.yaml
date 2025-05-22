@@ -39,10 +39,18 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "TF_VAR_github_token=${{ steps.app-token.outputs.token }}" > .env
-          echo "TF_HTTP_PASSWORD=${{ steps.app-token.outputs.token }}" > .env
-          echo "TF_GITHUB_ORG=${{ github.repository_owner }}" >> .env
-          echo "TF_GITHUB_REPO=${{ github.event.repository.name }}" >> .env
+          # Create fresh .env file with required variables
+          {
+            echo "# Terraform HTTP Backend Authentication"
+            echo "TF_HTTP_PASSWORD=${{ steps.app-token.outputs.token }}"
+            echo ""
+            echo "# GitHub Provider Authentication"
+            echo "TF_VAR_github_token=${{ steps.app-token.outputs.token }}"
+            echo ""
+            echo "# Additional Configuration"
+            echo "TF_GITHUB_ORG=${{ github.repository_owner }}"
+            echo "TF_GITHUB_REPO=${{ github.event.repository.name }}"
+          } > .env
 
       - name: Build Docker image
         run: make build-image
