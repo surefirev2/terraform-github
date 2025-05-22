@@ -46,6 +46,15 @@ variable "repositories" {
         repository = "template-cursor"
       }
     }
+    "comic-reader" = {
+      name        = "comic-reader"
+      description = "A nuxt PWA to help read comics"
+      visibility  = "public"
+      is_template = false
+      template = {
+        repository = "template-cursor"
+      }
+    }
   }
 }
 
