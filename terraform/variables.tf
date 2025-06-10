@@ -55,9 +55,9 @@ variable "repositories" {
         repository = "template-cursor"
       }
     }
-    "rfp-promptql" = {
-      name        = "rfp-promptql"
-      description = "A rfp built on promptql"
+    "rfp-langchain" = {
+      name        = "rfp-langchain"
+      description = "A rfp built on langchain"
       visibility  = "private"
       is_template = false
       template = {
