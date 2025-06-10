@@ -11,7 +11,7 @@ terraform {
   required_providers {
     github = {
       source  = "integrations/github"
-      version = "~> 5.0"
+      version = "< 5.15.0"
     }
     local = {
       source  = "hashicorp/local"
@@ -57,8 +57,14 @@ resource "github_repository" "repos" {
     }
   }
 
-  has_issues           = var.repository_settings.has_issues
-  has_projects         = var.repository_settings.has_projects
-  has_wiki             = var.repository_settings.has_wiki
-  vulnerability_alerts = false
+  has_issues   = var.repository_settings.has_issues
+  has_projects = var.repository_settings.has_projects
+  has_wiki     = var.repository_settings.has_wiki
+
+  lifecycle {
+    ignore_changes = [
+      vulnerability_alerts,
+      security_and_analysis,
+    ]
+  }
 }

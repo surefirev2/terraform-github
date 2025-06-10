@@ -55,6 +55,15 @@ variable "repositories" {
         repository = "template-cursor"
       }
     }
+    "rfp-promptql" = {
+      name        = "rfp-promptql"
+      description = "A rfp built on promptql"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-cursor"
+      }
+    }
   }
 }
 
