@@ -60,4 +60,11 @@ resource "github_repository" "repos" {
   has_issues   = var.repository_settings.has_issues
   has_projects = var.repository_settings.has_projects
   has_wiki     = var.repository_settings.has_wiki
+
+  lifecycle {
+    ignore_changes = [
+      vulnerability_alerts,
+      security_and_analysis,
+    ]
+  }
 }

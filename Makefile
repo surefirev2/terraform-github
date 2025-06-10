@@ -28,7 +28,7 @@ init: build-image
         -u $(USER_ID):$(GROUP_ID) \
         -v $(PWD)/$(TERRAFORM_DIR):/workspace \
         -w /workspace \
-        $(TERRAFORM_IMAGE) init -reconfigure
+        $(TERRAFORM_IMAGE) init -upgrade
 
 .PHONY: validate
 validate: init
