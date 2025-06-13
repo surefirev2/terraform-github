@@ -64,6 +64,15 @@ variable "repositories" {
         repository = "template-cursor"
       }
     }
+    "gallery" = {
+      name        = "gallery"
+      description = "TBD"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-cursor"
+      }
+    }
   }
 }
 
