@@ -73,6 +73,15 @@ variable "repositories" {
         repository = "template-cursor"
       }
     }
+    "tutorv1" = {
+      name        = "tutorv1"
+      description = "TBD"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-cursor"
+      }
+    }
   }
 }
 
