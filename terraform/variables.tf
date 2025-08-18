@@ -82,6 +82,16 @@ variable "repositories" {
         repository = "template-cursor"
       }
     }
+    "repo-scan" = {
+      name        = "repo-scan"
+      description = "TBD"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-cursor"
+      }
+    }
+
   }
 }
 
