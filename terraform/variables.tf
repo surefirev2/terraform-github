@@ -91,7 +91,24 @@ variable "repositories" {
         repository = "template-cursor"
       }
     }
-
+    "info-amalgamator" = {
+      name        = "info-amalgamator"
+      description = "TBD"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-cursor"
+      }
+    }
+    "lumen" = {
+      name        = "lumen"
+      description = "TBD"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-cursor"
+      }
+    }
   }
 }
 
