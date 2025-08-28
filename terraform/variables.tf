@@ -92,6 +92,15 @@ variable "repositories" {
       }
     }
 
+    "info-amalgamator" = {
+      name        = "info-amalgamator"
+      description = "TBD"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-cursor"
+      }
+    }
   }
 }
 
