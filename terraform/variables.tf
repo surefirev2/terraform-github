@@ -109,6 +109,15 @@ variable "repositories" {
         repository = "template-cursor"
       }
     }
+    "math_spike1" = {
+      name        = "math_spike1"
+      description = "TBD"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-cursor"
+      }
+    }
   }
 }
 
