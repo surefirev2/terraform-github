@@ -118,6 +118,15 @@ variable "repositories" {
         repository = "template-cursor"
       }
     }
+    "math_instructure" = {
+      name        = "math_instructure"
+      description = "TBD"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-cursor"
+      }
+    }
   }
 }
 
