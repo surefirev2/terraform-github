@@ -127,6 +127,16 @@ variable "repositories" {
         repository = "template-cursor"
       }
     }
+
+    "math_nuxt_chat_ui" = {
+      name        = "math_nuxt_chat_ui"
+      description = "TBD"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-cursor"
+      }
+    }
   }
 }
 
