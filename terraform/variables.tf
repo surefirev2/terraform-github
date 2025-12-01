@@ -118,6 +118,24 @@ variable "repositories" {
         repository = "template-cursor"
       }
     }
+    "math_spike2" = {
+      name        = "math_spike2"
+      description = "TBD"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-cursor"
+      }
+    }
+    "math_langchain" = {
+      name        = "math_langchain"
+      description = "TBD"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-cursor"
+      }
+    }
     "math_instructure" = {
       name        = "math_instructure"
       description = "TBD"
@@ -127,9 +145,17 @@ variable "repositories" {
         repository = "template-cursor"
       }
     }
-
     "math_nuxt_chat_ui" = {
       name        = "math_nuxt_chat_ui"
+      description = "TBD"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-cursor"
+      }
+    }
+    "private_ai" = {
+      name        = "private_ai"
       description = "TBD"
       visibility  = "private"
       is_template = false
