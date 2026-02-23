@@ -53,6 +53,9 @@ jobs:
           key: terraform-stale-lock-${{ github.repository }}
           fail-on-cache-miss: false
 
+      - name: Wait for state unlock (pre-plan)
+        run: .github/scripts/terraform-wait-unlock.sh
+
       - name: Run Terraform plan
         id: plan
         env:
@@ -98,6 +101,10 @@ jobs:
         with:
           header: terraform-plan
           path: terraform/plan/terraform.txt
+
+      - name: Wait for state unlock (pre-apply)
+        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: .github/scripts/terraform-wait-unlock.sh
 
       - name: Apply Terraform
         if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
