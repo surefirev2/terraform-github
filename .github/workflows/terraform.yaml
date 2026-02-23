@@ -55,7 +55,10 @@ jobs:
 
       - name: Run Terraform plan
         id: plan
+        env:
+          TF_LOG: INFO
         run: |
+          set -o pipefail
           make plan 2>&1 | tee plan-output.txt
           echo "${PIPESTATUS[0]}" > plan-exit.txt
 
