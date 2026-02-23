@@ -11,6 +11,10 @@ on:
 permissions:
   pull-requests: write
 
+concurrency:
+  group: terraform-${{ github.repository }}
+  cancel-in-progress: false
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
@@ -23,45 +27,75 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Cache Docker layers
-        uses: actions/cache@v5
+        uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Generate GitHub App Token
-        id: app-token
-        uses: actions/create-github-app-token@v2
+      - name: Terraform setup
+        uses: ./.github/actions/terraform-setup
         with:
-          app-id: ${{ vars.APP_ID }}
-          private-key: ${{ secrets.PRIVATE_KEY }}
-
-      - name: Create .env file
-        run: |
-          echo "TF_HTTP_PASSWORD=${{ steps.app-token.outputs.token }}" > .env
-          echo "TF_GITHUB_ORG=${{ github.repository_owner }}" >> .env
-          echo "TF_GITHUB_REPO=${{ github.event.repository.name }}" >> .env
-
-      - name: Build Docker image
-        run: make build-image
-
-      - name: Initialize Terraform
-        run: make init
+          app_id: ${{ vars.APP_ID }}
+          private_key: ${{ secrets.PRIVATE_KEY }}
+          org: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
 
       - name: Validate Terraform
         run: make validate
 
-      - name: Plan Terraform
-        run: make plan
+      - name: Restore lock cache
+        uses: actions/cache/restore@v4
+        id: lock-cache
+        with:
+          path: .terraform-lock-cache
+          key: terraform-stale-lock-${{ github.repository }}
+          fail-on-cache-miss: false
+
+      - name: Run Terraform plan
+        id: plan
+        run: |
+          make plan 2>&1 | tee plan-output.txt
+          echo "${PIPESTATUS[0]}" > plan-exit.txt
+
+      - name: Parse lock ID
+        id: parse-lock
+        if: failure() && steps.plan.outcome == 'failure'
+        run: |
+          LOCK_ID="$(.github/scripts/terraform-lock-id.sh plan-output.txt)"
+          echo "lock_id=$LOCK_ID" >> "$GITHUB_OUTPUT"
+          echo "LOCK_ID=$LOCK_ID" >> "$GITHUB_ENV"
+
+      - name: Handle lock (buffer or force-unlock after 1h)
+        if: failure() && steps.plan.outcome == 'failure'
+        env:
+          LOCK_ID: ${{ steps.parse-lock.outputs.lock_id }}
+          LOCK_CACHE_DIR: .terraform-lock-cache
+          STALE_SECONDS: "3600"
+        run: .github/scripts/terraform-lock-handle.sh
+
+      - name: Clear lock cache (on plan success)
+        if: success() && steps.plan.outcome == 'success'
+        run: |
+          mkdir -p .terraform-lock-cache
+          echo "" > .terraform-lock-cache/lock_id
+          echo "0" > .terraform-lock-cache/lock_timestamp
+
+      - name: Save lock cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .terraform-lock-cache
+          key: terraform-stale-lock-${{ github.repository }}
 
       - name: Post plan to PR
-        if: github.event_name == 'pull_request'
+        if: success() && github.event_name == 'pull_request' && hashFiles('terraform/plan/terraform.txt') != ''
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: terraform-plan
           path: terraform/plan/terraform.txt
 
       - name: Apply Terraform
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: make apply
