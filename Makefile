@@ -1,4 +1,11 @@
 # Makefile
+#
+# Remote state (tfstate.dev) requires .env with:
+#   TF_HTTP_USERNAME=surefirev2/terraform-github   # owner/repo for HTTP Basic auth
+#   TF_HTTP_PASSWORD=<GitHub PAT or token>         # must have repo access; if you see
+#   TF_VAR_github_token=<same token>               # "invalid auth", regenerate PAT with repo scope
+# Fine-grained PATs: grant Metadata (or Contents) read for tfstate.dev; for plan, also
+#   grant Security events / Dependabot alerts read so the GitHub provider can read repo state.
 
 # Docker image
 TERRAFORM_IMAGE = terraform
