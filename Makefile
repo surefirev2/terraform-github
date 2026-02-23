@@ -46,6 +46,8 @@ validate: init
         -w /workspace \
         $(TERRAFORM_IMAGE) validate
 
+# Plan without refresh to avoid 403 when reading vulnerability_alerts (token/org lacks access).
+# Apply still refreshes; use a token with security access or ignore_vulnerability_alerts_during_read.
 .PHONY: plan
 plan: init
 	mkdir -p $(PLAN_DIR)
@@ -54,7 +56,7 @@ plan: init
         -u $(USER_ID):$(GROUP_ID) \
         -v $(PWD)/$(TERRAFORM_DIR):/workspace \
         -w /workspace \
-        $(TERRAFORM_IMAGE) plan -out=/workspace/plan/terraform.plan
+        $(TERRAFORM_IMAGE) plan -refresh=false -out=/workspace/plan/terraform.plan
 	docker run --rm --entrypoint /bin/sh \
         --env-file .env \
         -u $(USER_ID):$(GROUP_ID) \
