@@ -1,4 +1,6 @@
 ---
+# OWNED BY template-template — do not edit. Changes will be overwritten on the next sync.
+# Source: https://github.com/surefirev2/template-template
 name: pre-commit
 
 on:  # yamllint disable-line rule:truthy
@@ -23,5 +25,3 @@ jobs:
         python-version: '3.8'
     - run: pip install 'virtualenv<20.11.0'
     - uses: pre-commit/action@v3.0.1
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
