@@ -1,4 +1,6 @@
 ---
+# OWNED BY template-template — do not edit. Changes will be overwritten on the next sync.
+# Source: https://github.com/surefirev2/template-template
 name: Update pre-commit hooks
 
 on:
