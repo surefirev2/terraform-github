@@ -1,0 +1,39 @@
+# Shared Terraform CI setup: app token, .env, build image, init.
+# Requires: checkout and docker/setup-buildx already run; .env is written for later steps.
+# Inputs: app_id, private_key, org, repo (e.g. github.repository_owner, github.event.repository.name).
+name: Terraform setup
+description: Create .env, build Terraform image, run terraform init
+inputs:
+  app_id:
+    required: true
+  private_key:
+    required: true
+  org:
+    required: true
+  repo:
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Generate GitHub App Token
+      id: app-token
+      uses: actions/create-github-app-token@v2
+      with:
+        app-id: ${{ inputs.app_id }}
+        private-key: ${{ inputs.private_key }}
+
+    - name: Create .env file
+      shell: bash
+      run: |
+        echo "TF_HTTP_PASSWORD=${{ steps.app-token.outputs.token }}" > .env
+        echo "TF_GITHUB_ORG=${{ inputs.org }}" >> .env
+        echo "TF_GITHUB_REPO=${{ inputs.repo }}" >> .env
+        echo "TF_VAR_github_token=${{ steps.app-token.outputs.token }}" >> .env
+
+    - name: Build Docker image
+      run: make build-image
+      shell: bash
+
+    - name: Initialize Terraform
+      run: make init
+      shell: bash

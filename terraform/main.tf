@@ -61,6 +61,17 @@ resource "github_repository" "repos" {
   has_projects = var.repository_settings.has_projects
   has_wiki     = var.repository_settings.has_wiki
 
+  allow_auto_merge       = true
+  allow_merge_commit     = false
+  allow_update_branch    = true
+  delete_branch_on_merge = true
+
+  # Skip reading vulnerability_alerts so plan/apply works when the token or org
+  # cannot access the endpoint (403: Resource not accessible by integration).
+  # We do not manage vulnerability_alerts; lifecycle.ignore_changes already
+  # ignores drift for vulnerability_alerts and security_and_analysis.
+  ignore_vulnerability_alerts_during_read = true
+
   lifecycle {
     ignore_changes = [
       vulnerability_alerts,
