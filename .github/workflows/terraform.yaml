@@ -63,7 +63,9 @@ jobs:
         run: |
           set -o pipefail
           make plan 2>&1 | tee plan-output.txt
-          echo "${PIPESTATUS[0]}" > plan-exit.txt
+          code=${PIPESTATUS[0]}
+          echo "$code" > plan-exit.txt
+          exit $code
 
       - name: Parse lock ID
         id: parse-lock
