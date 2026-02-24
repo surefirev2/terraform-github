@@ -169,7 +169,7 @@ variable "repositories" {
       visibility  = "private"
       is_template = false
       template = {
-        repository = "template-cursor"
+        repository = "template-1-terraform"
       }
     }
   }
