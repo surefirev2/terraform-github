@@ -128,23 +128,39 @@ for repo in $REPOS_LIST; do
   git push origin "${BRANCH}" --force
 
   DEFAULT_BASE=$(gh repo view "${ORG}/${repo}" --json defaultBranchRef -q .defaultBranchRef.name 2>/dev/null || echo "main")
-  PR_BODY="Automated sync from $SOURCE_REPO."
-  [[ -n "${PARENT_PR_URL:-}" ]] && PR_BODY="${PR_BODY} [Parent PR](${PARENT_PR_URL})."
-  PR_BODY="${PR_BODY} Merge when checks pass."
+  PR_BODY_FILE=$(mktemp)
+  {
+    echo "Automated sync from $SOURCE_REPO."
+    [[ -n "${PARENT_PR_URL:-}" ]] && echo " [Parent PR](${PARENT_PR_URL})."
+    echo ""
+    if [[ -n "${PARENT_PR_NUMBER:-}" && -n "${GITHUB_REPOSITORY:-}" ]]; then
+      PARENT_PR_BODY=$(gh pr view "$PARENT_PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json body -q '.body' 2>/dev/null || true)
+      if [[ -n "${PARENT_PR_BODY}" ]]; then
+        echo "**Parent PR description:**"
+        echo ""
+        printf '%s' "$PARENT_PR_BODY" | sed 's/^/> /'
+        echo ""
+        echo ""
+      fi
+    fi
+    echo "Merge when checks pass."
+  } > "$PR_BODY_FILE"
   PR=$(gh pr list --repo "${ORG}/${repo}" --head "${BRANCH}" --json number -q '.[0].number' 2>/dev/null || true)
   if [[ -z "$PR" || "$PR" = "null" ]]; then
     if [[ -n "${DRAFT_PR}" ]]; then
       gh pr create --repo "${ORG}/${repo}" --base "${DEFAULT_BASE}" --head "${BRANCH}" \
         --title "chore(template): sync from $SOURCE_REPO" \
-        --body "$PR_BODY" \
+        --body-file "$PR_BODY_FILE" \
         --draft
     else
       gh pr create --repo "${ORG}/${repo}" --base "${DEFAULT_BASE}" --head "${BRANCH}" \
         --title "chore(template): sync from $SOURCE_REPO" \
-        --body "$PR_BODY"
+        --body-file "$PR_BODY_FILE"
     fi
+    rm -f "$PR_BODY_FILE"
     PR=$(gh pr list --repo "${ORG}/${repo}" --head "${BRANCH}" --json number -q '.[0].number' 2>/dev/null || true)
   else
+    rm -f "$PR_BODY_FILE"
     if [[ -z "${DRAFT_PR}" ]]; then
       is_draft=$(gh pr view "$PR" --repo "${ORG}/${repo}" --json isDraft -q '.isDraft' 2>/dev/null || true)
       if [[ "$is_draft" == "true" ]]; then
