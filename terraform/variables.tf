@@ -163,6 +163,15 @@ variable "repositories" {
         repository = "template-cursor"
       }
     }
+    "terraform-cloudflare" = {
+      name        = "terraform-cloudflare"
+      description = "Terraform configuration for Cloudflare"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-cursor"
+      }
+    }
   }
 }
 
