@@ -34,11 +34,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
+      - name: Load GitHub PAT from 1Password
+        uses: 1password/load-secrets-action@v3
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          GITHUB_PAT: op://surefireops/github_actions_secrets_terraform/github_classic_token
+
       - name: Terraform setup
         uses: ./.github/actions/terraform-setup
         with:
-          app_id: ${{ vars.APP_ID }}
-          private_key: ${{ secrets.PRIVATE_KEY }}
           org: ${{ github.repository_owner }}
           repo: ${{ github.event.repository.name }}
 
