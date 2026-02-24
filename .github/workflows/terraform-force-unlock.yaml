@@ -1,0 +1,64 @@
+# Manual workflow to remove the current Terraform state lock.
+# Run from Actions tab when a lock is stuck (e.g. after a cancelled run).
+name: Terraform force-unlock
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  force-unlock:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Load GitHub PAT from 1Password
+        uses: 1password/load-secrets-action@v3
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          GITHUB_PAT: op://surefireops/github_actions_secrets_terraform/github_classic_token
+
+      - name: Terraform setup
+        uses: ./.github/actions/terraform-setup
+        with:
+          org: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
+
+      - name: Run plan to detect lock (may fail)
+        id: plan
+        continue-on-error: true
+        run: make plan 2>&1 | tee plan-output.txt
+
+      - name: Parse lock ID
+        id: parse
+        run: |
+          LOCK_ID="$(.github/scripts/terraform-lock-id.sh plan-output.txt)"
+          echo "lock_id=$LOCK_ID" >> "$GITHUB_OUTPUT"
+          if [ -n "$LOCK_ID" ]; then
+            echo "Lock ID: $LOCK_ID"
+          else
+            echo "No lock ID found in plan output."
+          fi
+
+      - name: Force-unlock state
+        if: steps.parse.outputs.lock_id != ''
+        run: make force-unlock LOCK_ID="${{ steps.parse.outputs.lock_id }}"
+
+      - name: Summary
+        run: |
+          if [ -n "${{ steps.parse.outputs.lock_id }}" ]; then
+            echo "## Unlock result" >> "$GITHUB_STEP_SUMMARY"
+            echo "Force-unlocked state with ID: \`${{ steps.parse.outputs.lock_id }}\`" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "## No lock found" >> "$GITHUB_STEP_SUMMARY"
+            echo "Plan output did not contain a lock ID. State may already be unlocked or the failure was for another reason." >> "$GITHUB_STEP_SUMMARY"
+          fi
