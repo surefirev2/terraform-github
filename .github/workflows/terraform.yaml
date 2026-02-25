@@ -120,4 +120,4 @@ jobs:
 
       - name: Apply Terraform
         if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: make apply
+        run: .github/scripts/terraform-apply-unlock-retry.sh
