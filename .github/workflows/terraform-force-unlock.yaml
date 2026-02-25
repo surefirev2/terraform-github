@@ -1,3 +1,4 @@
+# Synced from template — do not edit. Changes will be overwritten on the next sync.
 # Manual workflow to remove the current Terraform state lock.
 # Run from Actions tab when a lock is stuck (e.g. after a cancelled run).
 name: Terraform force-unlock

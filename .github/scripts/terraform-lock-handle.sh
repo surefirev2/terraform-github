@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+# Synced from template — do not edit. Changes will be overwritten on the next sync.
 # After plan has been run (plan-output.txt, plan-exit.txt), parse lock ID and lock Created time.
 # If lock is stale (created >= STALE_SECONDS ago, or same lock cached for >= STALE_SECONDS),
 # force-unlock and retry plan. Otherwise save current lock and exit 1.
