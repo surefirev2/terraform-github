@@ -1,4 +1,5 @@
 # Makefile
+# Synced from template — do not edit. Changes will be overwritten on the next sync.
 
 # Docker image
 TERRAFORM_IMAGE = terraform

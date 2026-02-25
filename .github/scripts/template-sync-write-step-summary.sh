@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Synced from template — do not edit. Changes will be overwritten on the next sync.
 # OWNED BY template-template — do not edit. Changes will be overwritten on the next sync unless made in this repo.
 # Source: https://github.com/surefirev2/template-template
 #
