@@ -12,6 +12,16 @@ cd "$REPO_ROOT"
 [[ -f .env ]] || { echo ".env not found" >&2; exit 1; }
 mkdir -p terraform/plan
 
+# Ensure providers are installed so plan can run (avoids "Missing required provider" when
+# state references providers from the lock file and init was not run in this context).
+docker run --rm \
+  --env-file .env \
+  -e HOME=/workspace \
+  -u "$(id -u):$(id -g)" \
+  -v "$(pwd)/terraform:/workspace" \
+  -w /workspace \
+  terraform init -reconfigure
+
 start=$(date +%s)
 max_sec=$((MAX_WAIT_MINUTES * 60))
 
@@ -36,20 +46,29 @@ while true; do
     exit 1
   fi
 
+  # Capture full output to file so lock detection and lock-id parsing see complete output
+  # (avoids pipe/buffer races where grep ran before tee had written the error lines).
   docker run --rm \
     --env-file .env \
     -e HOME=/workspace \
     -u "$(id -u):$(id -g)" \
     -v "$(pwd)/terraform:/workspace" \
     -w /workspace \
-    terraform plan -refresh=false -input=false -out=/workspace/plan/wait.plan 2>&1 | tee /tmp/tf-wait-out.txt
-  code=${PIPESTATUS[0]}
+    terraform plan -refresh=false -input=false -out=/workspace/plan/wait.plan > /tmp/tf-wait-out.txt 2>&1 || true
+  cat /tmp/tf-wait-out.txt
+  # Infer exit code from output (docker exit is lost after || true).
+  if grep -qE "No changes|Terraform will perform the following actions" /tmp/tf-wait-out.txt 2>/dev/null; then
+    code=0
+  else
+    code=1
+  fi
 
   if [[ $code -eq 0 ]]; then
     echo "State unlocked."
     exit 0
   fi
-  if grep -qEi "locked|already locked" /tmp/tf-wait-out.txt 2>/dev/null; then
+  # Only treat as lock when we couldn't acquire it (not "Acquiring state lock" / "Releasing state lock").
+  if grep -qEi "already locked|error acquiring the state lock|state already locked" /tmp/tf-wait-out.txt 2>/dev/null; then
     echo "State locked, waiting ${SLEEP}s... (${elapsed}s elapsed)"
     sleep "$SLEEP"
     continue
