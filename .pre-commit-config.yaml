@@ -13,3 +13,12 @@ repos:
     hooks:
       - id: tf-fmt
       - id: tf-validate
+  # Ensure .terraform.lock.hcl is committed and in sync (pinned providers). Requires terraform on PATH.
+  - repo: local
+    hooks:
+      - id: terraform-lockfile
+        name: terraform lockfile in sync (pinned providers)
+        entry: .github/scripts/terraform-lockfile-readonly.sh
+        language: system
+        files: ^terraform/.*\.(tf|hcl)$
+        pass_filenames: false

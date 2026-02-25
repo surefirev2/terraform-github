@@ -1,24 +1,10 @@
-# Shared Terraform CI setup: .env from GITHUB_PAT, build image, init.
-# Requires: checkout, docker/setup-buildx, and GITHUB_PAT in env (e.g. from 1Password load-secrets).
-# Inputs: org, repo (e.g. github.repository_owner, github.event.repository.name).
+# Shared Terraform CI setup: build image, init.
+# Requires: checkout, docker/setup-buildx, and .env already created (e.g. by terraform-load-env.sh after 1Password).
 name: Terraform setup
-description: Create .env from GITHUB_PAT, build Terraform image, run terraform init
-inputs:
-  org:
-    required: true
-  repo:
-    required: true
+description: Build Terraform image and run terraform init
 runs:
   using: composite
   steps:
-    - name: Create .env file
-      shell: bash
-      run: |
-        echo "TF_HTTP_PASSWORD=$GITHUB_PAT" > .env
-        echo "TF_GITHUB_ORG=${{ inputs.org }}" >> .env
-        echo "TF_GITHUB_REPO=${{ inputs.repo }}" >> .env
-        echo "TF_VAR_github_token=$GITHUB_PAT" >> .env
-
     - name: Build Docker image
       run: make build-image
       shell: bash

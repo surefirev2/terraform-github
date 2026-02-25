@@ -19,22 +19,30 @@ jobs:
       - name: Ensure scripts are executable
         run: chmod +x .github/scripts/*.sh
 
+      - name: Set up Terraform (for lockfile check)
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5.0"
+      - name: Install pre-commit
+        run: pip install pre-commit
+      - name: Check Terraform lock file (pinned providers)
+        run: pre-commit run terraform-lockfile --all-files
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Load GitHub PAT from 1Password
-        uses: 1password/load-secrets-action@v3
-        with:
-          export-env: true
+      - name: Install 1Password CLI
+        uses: 1password/install-cli-action@v2
+
+      - name: Prepare .env for Terraform
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          GITHUB_PAT: op://surefireops/github_actions_secrets_terraform/github_classic_token
+          TF_GITHUB_ORG: ${{ github.repository_owner }}
+          TF_GITHUB_REPO: ${{ github.event.repository.name }}
+        run: .github/scripts/terraform-load-env.sh
 
       - name: Terraform setup
         uses: ./.github/actions/terraform-setup
-        with:
-          org: ${{ github.repository_owner }}
-          repo: ${{ github.event.repository.name }}
 
       - name: Run plan to detect lock (may fail)
         id: plan
