@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
-# Build .env for Terraform from .github/terraform-env-vars.conf (single source of truth).
-# Lines: VAR (copy from env) or VAR=op://vault/item/field (resolve via 1Password CLI).
-# Usage: run from repo root. Set TF_GITHUB_ORG, TF_GITHUB_REPO. For op:// lines set OP_SERVICE_ACCOUNT_TOKEN and have op on PATH.
+# Synced from template — do not edit. Changes will be overwritten on the next sync.
+# Build .env for Terraform from .github/terraform-env-vars.conf (config-driven secrets).
+#
+# Design: Single source of truth is the config file; this script is generic and must not
+# contain provider- or repo-specific logic (so it can be reverse-synced). Add new vars
+# in the repo's terraform-env-vars.conf only. For Terraform variables, put TF_VAR_<name>
+# in config (e.g. TF_VAR_cloudflare_api_token=op://...); the script does not derive them.
+#
+# Config lines: VAR (copy from env) | VAR=literal | VAR=op://vault/item/field (resolve via op CLI).
+# Usage: run from repo root. Set TF_GITHUB_ORG, TF_GITHUB_REPO. For op:// set OP_SERVICE_ACCOUNT_TOKEN.
 set -euo pipefail
 
 CONFIG="${1:-.github/terraform-env-vars.conf}"

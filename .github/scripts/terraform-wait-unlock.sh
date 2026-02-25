@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
-# Wait for Terraform state lock to be released by polling with a lightweight plan.
-# After MAX_WAIT_MINUTES, force-unlocks the state and exits 0 so the workflow can proceed.
-# Usage: run from repo root after Terraform setup and validate (so init and providers are already in terraform/.terraform). Requires .env and terraform image.
+# Synced from template — do not edit. Changes will be overwritten on the next sync.
+# Wait for Terraform state lock to be released, then exit 0 so the workflow can run plan/apply.
+#
+# Design: Run terraform init -reconfigure once so the container has providers (same .env and
+# image as make plan). Then poll with terraform plan until output shows success or "already
+# locked"; on timeout, force-unlock if we can parse a lock ID from the plan output. Used
+# before plan and before apply. See .github/docs/TERRAFORM_CI_DESIGN.md.
+#
+# Usage: run from repo root. Requires .env and terraform image. MAX_WAIT_MINUTES (default 5).
 set -euo pipefail
 
 MAX_WAIT_MINUTES="${TF_LOCK_WAIT_MINUTES:-5}"
@@ -12,9 +18,14 @@ cd "$REPO_ROOT"
 [[ -f .env ]] || { echo ".env not found" >&2; exit 1; }
 mkdir -p terraform/plan
 
-# Rely on init already run earlier in the job (Terraform setup + Validate). Running init
-# again here can install only a subset of providers from the lock file in a fresh container,
-# causing "Missing required provider" when state references other providers (e.g. cloudflare).
+# Ensure providers are in the mounted dir (CI workspace .terraform may not be visible to this step's docker run).
+docker run --rm \
+  --env-file .env \
+  -e HOME=/workspace \
+  -u "$(id -u):$(id -g)" \
+  -v "$(pwd)/terraform:/workspace" \
+  -w /workspace \
+  terraform init -reconfigure -input=false
 
 start=$(date +%s)
 max_sec=$((MAX_WAIT_MINUTES * 60))

@@ -1,3 +1,4 @@
+# Synced from template — do not edit. Changes will be overwritten on the next sync.
 # Shared Terraform CI setup: build image, init.
 # Requires: checkout, docker/setup-buildx, and .env already created (e.g. by terraform-load-env.sh after 1Password).
 name: Terraform setup

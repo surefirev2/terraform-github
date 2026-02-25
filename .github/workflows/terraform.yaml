@@ -1,3 +1,7 @@
+# Synced from template — do not edit. Changes will be overwritten on the next sync.
+# Terraform CI: plan on PRs, apply on push to main.
+# Design: config-driven env (.github/terraform-env-vars.conf → .env), lock file from init -backend=false,
+# wait-unlock before plan/apply. See .github/docs/TERRAFORM_CI_DESIGN.md.
 name: Terraform Workflow
 
 on:
@@ -13,7 +17,6 @@ permissions:
   contents: read
 
 # Separate groups so push-to-main (apply) is never canceled by PR (plan) runs.
-# Only one run per group at a time; one can be pending (latest commit wins within that group).
 concurrency:
   group: terraform-${{ github.repository }}-${{ github.event_name == 'push' && 'apply' || 'plan' }}
   cancel-in-progress: false
@@ -23,15 +26,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # --- Bootstrap ---
       - name: Checkout repository
         uses: actions/checkout@v6
 
       - name: Ensure scripts are executable
         run: chmod +x .github/scripts/*.sh
 
-      # Fail fast if .terraform.lock.hcl is out of sync (same check as pre-commit terraform-lockfile hook).
+      # Lock file must match init -backend=false (same as pre-commit terraform-lockfile hook).
       - name: Set up Terraform (for lockfile check)
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "1.5.0"
       - name: Install pre-commit
@@ -50,7 +54,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      # Config-driven secrets: .github/terraform-env-vars.conf lists VAR=op://... refs; script resolves them.
+      # --- Env: config-driven secrets → .env (no workflow edits for new vars) ---
       - name: Install 1Password CLI
         uses: 1password/install-cli-action@v2
 
@@ -64,20 +68,25 @@ jobs:
       - name: Terraform setup
         uses: ./.github/actions/terraform-setup
 
+      # --- Validate ---
       - name: Validate Terraform
         run: make validate
 
+      # --- Init for plan (providers in workspace for wait-unlock script) ---
       - name: Restore lock cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         id: lock-cache
         with:
           path: .terraform-lock-cache
           key: terraform-stale-lock-${{ github.repository }}
           fail-on-cache-miss: false
 
+      - name: Init Terraform (for wait-unlock)
+        run: make init
+
+      # --- Wait for state unlock, then plan ---
       - name: Wait for state unlock (pre-plan)
         run: .github/scripts/terraform-wait-unlock.sh
-        # Waits up to 5 min for lock release; then force-unlocks so plan can run.
 
       - name: Run Terraform plan
         id: plan
@@ -90,6 +99,7 @@ jobs:
           echo "$code" > plan-exit.txt
           exit $code
 
+      # On plan failure: parse lock ID; handle step force-unlocks if stale, else caches for next run.
       - name: Parse lock ID
         id: parse-lock
         if: failure() && steps.plan.outcome == 'failure'
@@ -115,11 +125,12 @@ jobs:
 
       - name: Save lock cache
         if: always()
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: .terraform-lock-cache
           key: terraform-stale-lock-${{ github.repository }}
 
+      # --- PR plan output ---
       - name: Post plan to PR
         if: success() && github.event_name == 'pull_request' && hashFiles('terraform/plan/terraform.txt') != ''
         uses: marocchino/sticky-pull-request-comment@v2
@@ -127,6 +138,7 @@ jobs:
           header: terraform-plan
           path: terraform/plan/terraform.txt
 
+      # --- Apply (push to main only) ---
       - name: Wait for state unlock (pre-apply)
         if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: .github/scripts/terraform-wait-unlock.sh

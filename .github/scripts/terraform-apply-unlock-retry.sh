@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Synced from template — do not edit. Changes will be overwritten on the next sync.
 # Run terraform apply; if it fails with state lock error, force-unlock and retry once.
 # Handles stale locks from cancelled or crashed runs when no other apply is in progress.
 # Usage: run from repo root after terraform init. Requires .env.
