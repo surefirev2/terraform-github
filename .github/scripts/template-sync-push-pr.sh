@@ -43,12 +43,6 @@ FILES_LIST="${FILES_LIST:-files_to_sync.txt}"
 FILES_LIST_TEMPLATE="${FILES_LIST_TEMPLATE:-}"
 SOURCE_REPO="${GITHUB_REPOSITORY:-$ORG/template-template}"
 PARENT_PR_URL="${PARENT_PR_URL:-}"
-PR_TITLE="chore(template): sync from $SOURCE_REPO"
-PR_BODY="Automated sync from $SOURCE_REPO. Merge when checks pass."
-if [[ -n "${PARENT_PR_NUMBER:-}" ]]; then
-  PR_TITLE="chore(template): sync from $SOURCE_REPO (PR #${PARENT_PR_NUMBER})"
-  PR_BODY="Automated sync from $SOURCE_REPO (parent PR: https://github.com/${SOURCE_REPO}/pull/${PARENT_PR_NUMBER}). Merge when checks pass."
-fi
 CHILD_PR_URLS_FILE="${CHILD_PR_URLS_FILE:-}"
 # Resolve to absolute path so appends work when we cd into dest_repo (otherwise file is written inside dest_repo and removed)
 [[ -n "$CHILD_PR_URLS_FILE" && "$CHILD_PR_URLS_FILE" != /* ]] && CHILD_PR_URLS_FILE="$(pwd)/$CHILD_PR_URLS_FILE"
@@ -155,12 +149,12 @@ for repo in $REPOS_LIST; do
   if [[ -z "$PR" || "$PR" = "null" ]]; then
     if [[ -n "${DRAFT_PR}" ]]; then
       gh pr create --repo "${ORG}/${repo}" --base "${DEFAULT_BASE}" --head "${BRANCH}" \
-        --title "$PR_TITLE" \
+        --title "chore(template): sync from $SOURCE_REPO" \
         --body-file "$PR_BODY_FILE" \
         --draft
     else
       gh pr create --repo "${ORG}/${repo}" --base "${DEFAULT_BASE}" --head "${BRANCH}" \
-        --title "$PR_TITLE" \
+        --title "chore(template): sync from $SOURCE_REPO" \
         --body-file "$PR_BODY_FILE"
     fi
     rm -f "$PR_BODY_FILE"
