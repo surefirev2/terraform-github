@@ -21,7 +21,7 @@ jobs:
         run: chmod +x .github/scripts/*.sh
 
       - name: Set up Terraform (for lockfile check)
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "1.5.0"
       - name: Install pre-commit

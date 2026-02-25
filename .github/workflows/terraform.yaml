@@ -35,7 +35,7 @@ jobs:
 
       # Lock file must match init -backend=false (same as pre-commit terraform-lockfile hook).
       - name: Set up Terraform (for lockfile check)
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "1.5.0"
       - name: Install pre-commit
