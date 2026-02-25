@@ -12,8 +12,10 @@ permissions:
   pull-requests: write
   contents: read
 
+# Separate groups so push-to-main (apply) is never canceled by PR (plan) runs.
+# Only one run per group at a time; one can be pending (latest commit wins within that group).
 concurrency:
-  group: terraform-${{ github.repository }}
+  group: terraform-${{ github.repository }}-${{ github.event_name == 'push' && 'apply' || 'plan' }}
   cancel-in-progress: false
 
 jobs:
@@ -118,4 +120,4 @@ jobs:
 
       - name: Apply Terraform
         if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: make apply
+        run: .github/scripts/terraform-apply-unlock-retry.sh
