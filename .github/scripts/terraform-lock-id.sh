@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+# Synced from template — do not edit. Changes will be overwritten on the next sync.
 # Parse Terraform state lock ID from plan/apply error output.
 # Usage: terraform-lock-id.sh [file]
 #   If file is given, read from file; otherwise stdin.
