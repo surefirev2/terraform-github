@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
-# Ensure .terraform.lock.hcl is present and in sync with provider requirements (pinned providers).
-# Run from repo root. Requires terraform on PATH to run the check.
-# If terraform is not on PATH, skip (exit 0) so shared pre-commit CI without Terraform still passes.
-# The Terraform workflow installs Terraform before running this hook, so the check runs there.
-# Exit 1 if lock file would need updating (run 'make init' and commit terraform/.terraform.lock.hcl).
+# Synced from template — do not edit. Changes will be overwritten on the next sync.
+# Ensure .terraform.lock.hcl is in sync with provider requirements (backend=false view).
+#
+# Design: Committed lock file must be from terraform init -backend=false so it only lists
+# required_providers (no backend-only provider). Pre-commit and CI run this same check. If
+# the lock file is wrong (e.g. has extra provider from 'make init'), we overwrite it and
+# exit 1 so you commit the fix — local and GHA CI then give equivalent results. Regenerate
+# with make lockfile. See .github/docs/TERRAFORM_CI_DESIGN.md.
+#
+# Usage: run from repo root. Requires terraform on PATH; if missing, exit 0 (CI without Terraform).
 set -euo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
@@ -15,7 +20,12 @@ if ! command -v terraform &>/dev/null; then
 fi
 
 # Use a temp data dir so we don't touch repo .terraform or need backend creds.
-# -backend=false: skip backend; we only verify provider lock file.
-# -lockfile=readonly: fail if lock file would need to be updated (ensures providers are pinned and committed).
 export TF_DATA_DIR="${TF_DATA_DIR:-$(mktemp -d -t tf-lockfile.XXXXXXXXXX)}"
-terraform -chdir=terraform init -backend=false -input=false -lockfile=readonly
+
+# Check with readonly first; if that fails, fix the lock file and exit 1 so pre-commit fails and you can commit the fix.
+if ! terraform -chdir=terraform init -backend=false -input=false -lockfile=readonly 2>&1; then
+  echo "terraform lockfile out of sync (e.g. extra backend-only provider). Regenerating with init -backend=false..." >&2
+  terraform -chdir=terraform init -backend=false -input=false
+  echo "Updated terraform/.terraform.lock.hcl. Add and commit it, then re-run pre-commit." >&2
+  exit 1
+fi
