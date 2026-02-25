@@ -49,6 +49,9 @@ while true; do
     exit 1
   fi
 
+  # Pipeline must not trigger set -e: we need to inspect output and wait or force-unlock.
+  # With pipefail, a failing terraform plan would exit the script before we could check for lock.
+  set +o pipefail
   docker run --rm \
     --env-file .env \
     -e HOME=/workspace \
@@ -57,6 +60,7 @@ while true; do
     -w /workspace \
     terraform plan -refresh=false -input=false -out=/workspace/plan/wait.plan 2>&1 | tee /tmp/tf-wait-out.txt
   code=${PIPESTATUS[0]}
+  set -o pipefail
 
   if [[ -n "${TF_LOCK_DEBUG:-}" ]]; then
     echo "[tf-wait-unlock] plan exit code=$code elapsed=${elapsed}s"
