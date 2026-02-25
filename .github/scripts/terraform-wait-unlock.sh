@@ -12,6 +12,16 @@ cd "$REPO_ROOT"
 [[ -f .env ]] || { echo ".env not found" >&2; exit 1; }
 mkdir -p terraform/plan
 
+# Ensure providers are installed so plan can run (avoids "Missing required provider" when
+# state references providers from the lock file and init was not run in this context).
+docker run --rm \
+  --env-file .env \
+  -e HOME=/workspace \
+  -u "$(id -u):$(id -g)" \
+  -v "$(pwd)/terraform:/workspace" \
+  -w /workspace \
+  terraform init -reconfigure
+
 start=$(date +%s)
 max_sec=$((MAX_WAIT_MINUTES * 60))
 
@@ -57,8 +67,8 @@ while true; do
     echo "State unlocked."
     exit 0
   fi
-  # Match all common Terraform lock error phrasings (e.g. "already locked", "state lock", "acquiring the state lock").
-  if grep -qEi "state lock|already locked|acquiring.*lock|error acquiring" /tmp/tf-wait-out.txt 2>/dev/null; then
+  # Only treat as lock when we couldn't acquire it (not "Acquiring state lock" / "Releasing state lock").
+  if grep -qEi "already locked|error acquiring the state lock|state already locked" /tmp/tf-wait-out.txt 2>/dev/null; then
     echo "State locked, waiting ${SLEEP}s... (${elapsed}s elapsed)"
     sleep "$SLEEP"
     continue
