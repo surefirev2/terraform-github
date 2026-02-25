@@ -77,6 +77,7 @@ for repo in $REPOS_LIST; do
   fi
 
   echo "--- Syncing to $ORG/$repo ---"
+  echo "  File list ($(wc -l < "$FILES_LIST" 2>/dev/null || echo 0) files): $(tr '\n' ' ' < "$FILES_LIST" 2>/dev/null | sed 's/ $//')"
   rm -rf dest_repo
   git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${ORG}/${repo}.git" dest_repo
   cd dest_repo
@@ -105,6 +106,10 @@ for repo in $REPOS_LIST; do
     echo "  No changes for $repo"
     # Still update PR state (e.g. mark draft as ready when syncing after merge)
     PR=$(gh pr list --repo "${ORG}/${repo}" --head "${BRANCH}" --json number -q '.[0].number' 2>/dev/null || true)
+    # If no PR for exact branch (e.g. PARENT_PR_NUMBER was empty on merge so branch lacked suffix), find draft PR whose head matches BRANCH-*
+    if [[ -z "$PR" || "$PR" == "null" ]] && [[ -z "${DRAFT_PR}" ]]; then
+      PR=$(gh pr list --repo "${ORG}/${repo}" --state open --json number,headRefName,isDraft -q '.[] | select(.headRefName | startswith("'"${BRANCH}"'-")) | select(.isDraft == true) | .number' 2>/dev/null | head -1)
+    fi
     if [[ -n "$PR" && "$PR" != "null" ]]; then
       if [[ -z "${DRAFT_PR}" ]]; then
         is_draft=$(gh pr view "$PR" --repo "${ORG}/${repo}" --json isDraft -q '.isDraft' 2>/dev/null || true)
