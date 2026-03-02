@@ -172,6 +172,15 @@ variable "repositories" {
         repository = "template-1-terraform"
       }
     }
+    "repo-sync-action" = {
+      name        = "repo-sync-action"
+      description = "GitHub Action to sync from any repository to any repository (created from template-template)"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-template"
+      }
+    }
   }
 }
 
