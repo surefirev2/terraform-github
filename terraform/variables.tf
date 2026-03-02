@@ -175,7 +175,7 @@ variable "repositories" {
     "repo-sync-action" = {
       name        = "repo-sync-action"
       description = "GitHub Action to sync from any repository to any repository (created from template-template)"
-      visibility  = "private"
+      visibility  = "public"
       is_template = false
       template = {
         repository = "template-template"
