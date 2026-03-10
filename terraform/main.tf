@@ -45,21 +45,20 @@ resource "null_resource" "fork" {
       SOURCE_OWNER="${each.value.source_owner}"
       SOURCE_REPO="${each.value.source_repo}"
       TARGET_NAME="${coalesce(each.value.name, each.value.source_repo)}"
-      # Fork into org (creates repo with same name as source)
-      curl -sSf -X POST \
-        -H "Authorization: token $GITHUB_TOKEN" \
-        -H "Accept: application/vnd.github.v3+json" \
-        -H "Content-Type: application/json" \
+      AUTH="Authorization: token $GITHUB_TOKEN"
+      ACCEPT="Accept: application/vnd.github.v3+json"
+      # Fork into org (creates repo with same name as source, or returns existing fork)
+      curl -sSf -X POST -H "$AUTH" -H "$ACCEPT" -H "Content-Type: application/json" \
         -d '{"organization":"surefirev2"}' \
-        "https://api.github.com/repos/$SOURCE_OWNER/$SOURCE_REPO/forks"
-      # Rename in org if desired name differs from source repo name
+        "https://api.github.com/repos/$SOURCE_OWNER/$SOURCE_REPO/forks" >/dev/null
+      # Rename in org if desired name differs from source repo name (idempotent: 422 = already exists)
       if [ "$TARGET_NAME" != "$SOURCE_REPO" ]; then
-        curl -sSf -X PATCH \
-          -H "Authorization: token $GITHUB_TOKEN" \
-          -H "Accept: application/vnd.github.v3+json" \
-          -H "Content-Type: application/json" \
+        if ! curl -sSf -X PATCH -H "$AUTH" -H "$ACCEPT" -H "Content-Type: application/json" \
           -d "{\"name\":\"$TARGET_NAME\"}" \
-          "https://api.github.com/repos/surefirev2/$SOURCE_REPO"
+          "https://api.github.com/repos/surefirev2/$SOURCE_REPO"; then
+          # PATCH can return 422 if target name already exists (e.g. from previous apply); verify target repo exists
+          curl -sSf -o /dev/null "https://api.github.com/repos/surefirev2/$TARGET_NAME" -H "$AUTH" -H "$ACCEPT" || exit 1
+        fi
       fi
     EOT
     environment = {
