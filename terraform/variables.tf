@@ -197,3 +197,19 @@ variable "repository_settings" {
     has_wiki     = false
   }
 }
+
+variable "repository_forks" {
+  description = "Repositories to fork into the organization. name = repo name in org (defaults to source_repo)."
+  type = list(object({
+    source_owner = string
+    source_repo  = string
+    name         = optional(string) # name in org; default source_repo
+  }))
+  default = [
+    {
+      source_owner = "Th0rgal"
+      source_repo  = "open-ralph-wiggum"
+      name         = "ralph-taskmaster-ai"
+    }
+  ]
+}
