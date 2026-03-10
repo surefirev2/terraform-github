@@ -75,15 +75,13 @@ data "github_repository" "forked" {
   depends_on = [null_resource.fork]
 }
 
-# Branch protection for forked repos (uses repo default branch, e.g. main or master)
+# Branch protection for forked repos (uses repo default branch, e.g. main or master).
+# for_each keys must be known at plan time; use var.repository_forks so we don't depend on data source.
 resource "github_branch_protection" "forked_default_branch" {
-  for_each = {
-    for k, r in data.github_repository.forked : k => r
-    if r.visibility != "private"
-  }
+  for_each = { for f in var.repository_forks : coalesce(f.name, f.source_repo) => f }
 
-  repository_id = each.value.node_id
-  pattern       = each.value.default_branch
+  repository_id = data.github_repository.forked[each.key].node_id
+  pattern       = data.github_repository.forked[each.key].default_branch
 
   required_status_checks {
     strict   = true
