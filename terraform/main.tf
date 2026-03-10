@@ -47,16 +47,17 @@ resource "null_resource" "fork" {
       TARGET_NAME="${coalesce(each.value.name, each.value.source_repo)}"
       AUTH="Authorization: token $GITHUB_TOKEN"
       ACCEPT="Accept: application/vnd.github.v3+json"
-      # Fork into org (creates repo with same name as source, or returns existing fork)
+      CODE=$(curl -sS -o /dev/null -w "%%{http_code}" "https://api.github.com/repos/surefirev2/$TARGET_NAME" -H "$AUTH" -H "$ACCEPT")
+      [ "$CODE" = "200" ] && exit 0
+      # Fork into org
       curl -sSf -X POST -H "$AUTH" -H "$ACCEPT" -H "Content-Type: application/json" \
         -d '{"organization":"surefirev2"}' \
         "https://api.github.com/repos/$SOURCE_OWNER/$SOURCE_REPO/forks" >/dev/null
-      # Rename in org if desired name differs from source repo name (idempotent: 422 = already exists)
+      # Rename in org if name != source (idempotent on 422)
       if [ "$TARGET_NAME" != "$SOURCE_REPO" ]; then
         if ! curl -sSf -X PATCH -H "$AUTH" -H "$ACCEPT" -H "Content-Type: application/json" \
           -d "{\"name\":\"$TARGET_NAME\"}" \
           "https://api.github.com/repos/surefirev2/$SOURCE_REPO"; then
-          # PATCH can return 422 if target name already exists (e.g. from previous apply); verify target repo exists
           curl -sSf -o /dev/null "https://api.github.com/repos/surefirev2/$TARGET_NAME" -H "$AUTH" -H "$ACCEPT" || exit 1
         fi
       fi
@@ -74,8 +75,7 @@ data "github_repository" "forked" {
   depends_on = [null_resource.fork]
 }
 
-# Branch protection for forked repos (uses repo default branch, e.g. main or master).
-# for_each keys must be known at plan time; use var.repository_forks so we don't depend on data source.
+# Branch protection for forked repos (default branch e.g. main or master)
 resource "github_branch_protection" "forked_default_branch" {
   for_each = { for f in var.repository_forks : coalesce(f.name, f.source_repo) => f }
 
