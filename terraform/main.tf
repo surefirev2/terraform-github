@@ -45,21 +45,21 @@ resource "null_resource" "fork" {
       SOURCE_OWNER="${each.value.source_owner}"
       SOURCE_REPO="${each.value.source_repo}"
       TARGET_NAME="${coalesce(each.value.name, each.value.source_repo)}"
-      # Fork into org (creates repo with same name as source)
-      curl -sSf -X POST \
-        -H "Authorization: token $GITHUB_TOKEN" \
-        -H "Accept: application/vnd.github.v3+json" \
-        -H "Content-Type: application/json" \
+      AUTH="Authorization: token $GITHUB_TOKEN"
+      ACCEPT="Accept: application/vnd.github.v3+json"
+      CODE=$(curl -sS -o /dev/null -w "%%{http_code}" "https://api.github.com/repos/surefirev2/$TARGET_NAME" -H "$AUTH" -H "$ACCEPT")
+      [ "$CODE" = "200" ] && exit 0
+      # Fork into org
+      curl -sSf -X POST -H "$AUTH" -H "$ACCEPT" -H "Content-Type: application/json" \
         -d '{"organization":"surefirev2"}' \
-        "https://api.github.com/repos/$SOURCE_OWNER/$SOURCE_REPO/forks"
-      # Rename in org if desired name differs from source repo name
+        "https://api.github.com/repos/$SOURCE_OWNER/$SOURCE_REPO/forks" >/dev/null
+      # Rename in org if name != source (idempotent on 422)
       if [ "$TARGET_NAME" != "$SOURCE_REPO" ]; then
-        curl -sSf -X PATCH \
-          -H "Authorization: token $GITHUB_TOKEN" \
-          -H "Accept: application/vnd.github.v3+json" \
-          -H "Content-Type: application/json" \
+        if ! curl -sSf -X PATCH -H "$AUTH" -H "$ACCEPT" -H "Content-Type: application/json" \
           -d "{\"name\":\"$TARGET_NAME\"}" \
-          "https://api.github.com/repos/surefirev2/$SOURCE_REPO"
+          "https://api.github.com/repos/surefirev2/$SOURCE_REPO"; then
+          curl -sSf -o /dev/null "https://api.github.com/repos/surefirev2/$TARGET_NAME" -H "$AUTH" -H "$ACCEPT" || exit 1
+        fi
       fi
     EOT
     environment = {
@@ -75,8 +75,7 @@ data "github_repository" "forked" {
   depends_on = [null_resource.fork]
 }
 
-# Branch protection for forked repos (uses repo default branch, e.g. main or master).
-# for_each keys must be known at plan time; use var.repository_forks so we don't depend on data source.
+# Branch protection for forked repos (default branch e.g. main or master)
 resource "github_branch_protection" "forked_default_branch" {
   for_each = { for f in var.repository_forks : coalesce(f.name, f.source_repo) => f }
 
