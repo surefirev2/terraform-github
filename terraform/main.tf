@@ -93,7 +93,7 @@ resource "github_branch_protection" "forked_default_branch" {
 
 # Create organization-wide branch protection
 resource "github_branch_protection" "default_branch" {
-  for_each = { for k, v in var.repositories : k => v if v.visibility != "private" }
+  for_each = var.repositories
 
   repository_id = github_repository.repos[each.key].node_id
   pattern       = "main"

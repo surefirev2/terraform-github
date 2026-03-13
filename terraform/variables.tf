@@ -181,6 +181,15 @@ variable "repositories" {
         repository = "template-template"
       }
     }
+    "hockeymind" = {
+      name        = "hockeymind"
+      description = "HockeyMind"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = ""
+      }
+    }
   }
 }
 
