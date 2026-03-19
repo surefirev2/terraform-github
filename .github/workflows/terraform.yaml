@@ -133,7 +133,7 @@ jobs:
       # --- PR plan output ---
       - name: Post plan to PR
         if: success() && github.event_name == 'pull_request' && hashFiles('terraform/plan/terraform.txt') != ''
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         with:
           header: terraform-plan
           path: terraform/plan/terraform.txt
