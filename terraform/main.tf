@@ -1,11 +1,12 @@
 terraform {
-  backend "http" {
-    address        = "https://api.tfstate.dev/github/v1"
-    lock_address   = "https://api.tfstate.dev/github/v1/lock"
-    unlock_address = "https://api.tfstate.dev/github/v1/lock"
-    lock_method    = "PUT"
-    unlock_method  = "DELETE"
-    username       = "surefirev2/terraform-github"
+  # Remote state: S3 + native lockfile (Terraform 1.10+). IAM must allow state + lock objects under key prefix.
+  # Override bucket/key/region here if your org uses different naming (see terraform-1password.md).
+  backend "s3" {
+    bucket       = "surefirev2-terraform-state"
+    key          = "github/surefirev2/terraform-github/terraform.tfstate"
+    region       = "us-east-1"
+    encrypt      = true
+    use_lockfile = true
   }
 
   required_providers {
