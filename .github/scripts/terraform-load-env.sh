@@ -22,7 +22,7 @@ fi
 : "${TF_GITHUB_ORG:?TF_GITHUB_ORG is required}"
 : "${TF_GITHUB_REPO:?TF_GITHUB_REPO is required}"
 
-# When we set GITHUB_PAT (from env or op), record so we can write TF_HTTP_PASSWORD / TF_VAR_github_token
+# When we set GITHUB_PAT (from env or op), record so we can write TF_VAR_github_token for the GitHub provider
 github_pat_value=""
 
 write_var() {
@@ -84,13 +84,12 @@ if [[ -z "${github_pat_value:-}" ]] && [[ -n "${GITHUB_PAT:-}" ]]; then
   github_pat_value="$GITHUB_PAT"
 fi
 
-# Terraform backend and provider: derive from GITHUB_PAT when set
+# GitHub provider: derive TF_VAR_github_token from GITHUB_PAT when set (S3 backend uses AWS_* from config)
 if [[ -n "${github_pat_value:-}" ]]; then
-  echo "TF_HTTP_PASSWORD=${github_pat_value}" >> "$ENV_FILE"
   echo "TF_VAR_github_token=${github_pat_value}" >> "$ENV_FILE"
 fi
 
-# Required for backend / init
+# Context for scripts / docs (S3 backend does not use these for state)
 echo "TF_GITHUB_ORG=${TF_GITHUB_ORG}" >> "$ENV_FILE"
 echo "TF_GITHUB_REPO=${TF_GITHUB_REPO}" >> "$ENV_FILE"
 

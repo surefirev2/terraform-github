@@ -1,6 +1,6 @@
 # Synced from template — do not edit. Changes will be overwritten on the next sync.
 # Terraform CI: plan on PRs, apply on push to main.
-# Design: config-driven env (.github/terraform-env-vars.conf → .env), lock file from init -backend=false,
+# Design: config-driven env (.github/terraform-env-vars.conf → .env via 1Password op read), lock file from init -backend=false,
 # wait-unlock before plan/apply. See .github/docs/TERRAFORM_CI_DESIGN.md.
 name: Terraform Workflow
 
@@ -44,7 +44,7 @@ jobs:
         run: pre-commit run terraform-lockfile --all-files
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@v3
 
       - name: Cache Docker layers
         uses: actions/cache@v5
@@ -133,7 +133,7 @@ jobs:
       # --- PR plan output ---
       - name: Post plan to PR
         if: success() && github.event_name == 'pull_request' && hashFiles('terraform/plan/terraform.txt') != ''
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         with:
           header: terraform-plan
           path: terraform/plan/terraform.txt
