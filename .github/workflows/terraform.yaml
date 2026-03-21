@@ -1,6 +1,6 @@
 # Synced from template — do not edit. Changes will be overwritten on the next sync.
 # Terraform CI: plan on PRs, apply on push to main.
-# Design: config-driven env (.github/terraform-env-vars.conf → .env), lock file from init -backend=false,
+# Design: config-driven env (.github/terraform-env-vars.conf → .env via 1Password op read), lock file from init -backend=false,
 # wait-unlock before plan/apply. See .github/docs/TERRAFORM_CI_DESIGN.md.
 name: Terraform Workflow
 
@@ -37,7 +37,7 @@ jobs:
       - name: Set up Terraform (for lockfile check)
         uses: hashicorp/setup-terraform@v4
         with:
-          terraform_version: "1.5.0"
+          terraform_version: "1.14.7"
       - name: Install pre-commit
         run: pip install pre-commit
       - name: Check Terraform lock file (pinned providers)
