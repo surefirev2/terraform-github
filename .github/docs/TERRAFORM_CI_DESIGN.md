@@ -10,4 +10,4 @@ This repository follows the **template-1-terraform** pattern:
 
 **Pre-commit**: `terraform-lockfile` runs `terraform init -backend=false -lockfile=readonly` in `terraform/` so `.terraform.lock.hcl` tracks providers only (no backend credentials required).
 
-For 1Password field names, IAM, and bucket/key for this repo, see [`terraform-1password.md`](../../terraform-1password.md) and [`PRD-remote-state-s3-1password.md`](../../PRD-remote-state-s3-1password.md).
+For 1Password field names, IAM, and bucket/key for this repo, see [`terraform-1password.md`](../../terraform-1password.md).

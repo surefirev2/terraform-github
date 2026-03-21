@@ -1,6 +1,6 @@
 # Terraform + 1Password (CI and local)
 
-This repository loads secrets for Terraform via [`.github/terraform-env-vars.conf`](.github/terraform-env-vars.conf) and [`.github/scripts/terraform-load-env.sh`](.github/scripts/terraform-load-env.sh). See also [PRD-remote-state-s3-1password.md](PRD-remote-state-s3-1password.md).
+This repository loads secrets for Terraform via [`.github/terraform-env-vars.conf`](.github/terraform-env-vars.conf) and [`.github/scripts/terraform-load-env.sh`](.github/scripts/terraform-load-env.sh).
 
 ## 1Password item (CI)
 

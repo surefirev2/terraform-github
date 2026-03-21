@@ -1,6 +1,6 @@
 # Synced from template — do not edit. Changes will be overwritten on the next sync.
 # Terraform CI: plan on PRs, apply on push to main.
-# Design: config-driven env (.github/terraform-env-vars.conf → .env via 1Password op read), lock file from init -backend=false,
+# Design: terraform-env-vars.conf → .env, lock file from init -backend=false,
 # wait-unlock before plan/apply. See .github/docs/TERRAFORM_CI_DESIGN.md.
 name: Terraform Workflow
 
