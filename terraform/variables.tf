@@ -190,6 +190,15 @@ variable "repositories" {
         repository = ""
       }
     }
+    "ethan_carpentry" = {
+      name        = "ethan_carpentry"
+      description = "Ethans Carpetnry project"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = ""
+      }
+    }
   }
 }
 
