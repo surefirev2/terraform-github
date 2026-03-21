@@ -1,6 +1,5 @@
 terraform {
-  # Remote state: S3 + native lockfile (Terraform 1.10+). IAM must allow state + lock objects under key prefix.
-  # Override bucket/key/region here if your org uses different naming (see terraform-1password.md).
+  # S3 backend; see terraform-1password.md for IAM and bucket/key overrides.
   backend "s3" {
     bucket       = "surefirev2-terraform-state"
     key          = "github/surefirev2/terraform-github/terraform.tfstate"
@@ -91,9 +90,12 @@ resource "github_branch_protection" "forked_default_branch" {
   enforce_admins = true
 }
 
-# Create organization-wide branch protection
+# Default branch (main); non-private repos plus hockeymind.
 resource "github_branch_protection" "default_branch" {
-  for_each = var.repositories
+  for_each = merge(
+    { for k, v in var.repositories : k => v if v.visibility != "private" },
+    { hockeymind = var.repositories["hockeymind"] }
+  )
 
   repository_id = github_repository.repos[each.key].node_id
   pattern       = "main"

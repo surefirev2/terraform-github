@@ -1,8 +1,7 @@
 # variables.tf
-# No variables needed for this simple example
 
 variable "github_token" {
-  description = "GitHub token for authentication. With Docker/make, set TF_VAR_github_token or GITHUB_TOKEN in .env (see Dockerfile entrypoint)."
+  description = "GitHub token for authentication"
   type        = string
   sensitive   = true
   default     = ""
