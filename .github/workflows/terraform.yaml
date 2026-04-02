@@ -1,6 +1,6 @@
 # Synced from template — do not edit. Changes will be overwritten on the next sync.
 # Terraform CI: plan on PRs, apply on push to main.
-# Design: terraform-env-vars.conf → .env, lock file from init -backend=false,
+# Design: config-driven env (.github/terraform-env-vars.conf → .env via 1Password op read), lock file from init -backend=false,
 # wait-unlock before plan/apply. See .github/docs/TERRAFORM_CI_DESIGN.md.
 name: Terraform Workflow
 
@@ -37,14 +37,14 @@ jobs:
       - name: Set up Terraform (for lockfile check)
         uses: hashicorp/setup-terraform@v4
         with:
-          terraform_version: "1.14.7"
+          terraform_version: "1.5.0"
       - name: Install pre-commit
         run: pip install pre-commit
       - name: Check Terraform lock file (pinned providers)
         run: pre-commit run terraform-lockfile --all-files
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@v3
 
       - name: Cache Docker layers
         uses: actions/cache@v5
@@ -56,7 +56,7 @@ jobs:
 
       # --- Env: config-driven secrets → .env (no workflow edits for new vars) ---
       - name: Install 1Password CLI
-        uses: 1password/install-cli-action@v2
+        uses: 1password/install-cli-action@v3
 
       - name: Prepare .env for Terraform
         env:
