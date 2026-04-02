@@ -56,7 +56,7 @@ jobs:
 
       # --- Env: config-driven secrets → .env (no workflow edits for new vars) ---
       - name: Install 1Password CLI
-        uses: 1password/install-cli-action@v2
+        uses: 1password/install-cli-action@v3
 
       - name: Prepare .env for Terraform
         env:
