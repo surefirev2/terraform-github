@@ -199,6 +199,15 @@ variable "repositories" {
         repository = ""
       }
     }
+    "comics_tauri" = {
+      name        = "comics_tauri"
+      description = "Comics"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template_template"
+      }
+    }
   }
 }
 
