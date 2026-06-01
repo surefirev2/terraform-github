@@ -208,6 +208,15 @@ variable "repositories" {
         repository = "template_template"
       }
     }
+    "comics_self_hosted" = {
+      name        = "comics_self_hosted"
+      description = "Self-hosted comics stack"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template_template"
+      }
+    }
   }
 }
 
