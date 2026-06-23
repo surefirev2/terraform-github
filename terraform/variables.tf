@@ -234,6 +234,14 @@ variable "repository_settings" {
   }
 }
 
+variable "branch_protection_status_checks" {
+  description = "Required status check contexts per repository key (defaults to pre-commit when absent)"
+  type        = map(list(string))
+  default = {
+    hockeymind = ["e2e (blacksmith-4vcpu-ubuntu-2404, 22)"]
+  }
+}
+
 variable "repository_collaborators" {
   description = "Outside collaborators per repository (keys must match var.repositories)"
   type = map(list(object({

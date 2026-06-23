@@ -102,7 +102,7 @@ resource "github_branch_protection" "default_branch" {
 
   required_status_checks {
     strict   = true
-    contexts = ["pre-commit"]
+    contexts = lookup(var.branch_protection_status_checks, each.key, ["pre-commit"])
   }
 
   enforce_admins = true
