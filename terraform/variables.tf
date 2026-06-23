@@ -154,6 +154,15 @@ variable "repositories" {
         repository = "template-cursor"
       }
     }
+    "math-desktop" = {
+      name        = "math-desktop"
+      description = "Epiphanie math desktop app"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = ""
+      }
+    }
     "private_ai" = {
       name        = "private_ai"
       description = "TBD"

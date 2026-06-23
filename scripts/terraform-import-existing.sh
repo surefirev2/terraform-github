@@ -27,12 +27,12 @@ FORK_KEY="ralph-taskmaster-ai"
 declare -a REPO_KEYS=(
   cursor nuxt-ucda invoice-x12-converter comic-reader rfp-langchain gallery tutorv1 repo-scan
   info-amalgamator lumen math_spike1 math_spike2 math_langchain math_instructure math_nuxt_chat_ui
-  private_ai terraform-cloudflare repo-sync-action
+  math-desktop private_ai terraform-cloudflare repo-sync-action
 )
 declare -a REPO_NAMES=(
   template-cursor nuxt-ucda invoice-x12-converter comic-reader rfp-langchain gallery tutorv1 repo-scan
   info-amalgamator lumen math_spike1 math_spike2 math_langchain math_instructure math_nuxt_chat_ui
-  private_ai terraform-cloudflare repo-sync-action
+  math-desktop private_ai terraform-cloudflare repo-sync-action
 )
 
 for i in "${!REPO_KEYS[@]}"; do
