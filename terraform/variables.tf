@@ -234,6 +234,22 @@ variable "repository_settings" {
   }
 }
 
+variable "repository_collaborators" {
+  description = "Outside collaborators per repository (keys must match var.repositories)"
+  type = map(list(object({
+    username   = string
+    permission = string # pull, triage, push, maintain, admin
+  })))
+  default = {
+    math_spike2 = [
+      {
+        username   = "kevinwm0"
+        permission = "maintain"
+      }
+    ]
+  }
+}
+
 variable "repository_forks" {
   description = "Repositories to fork into the organization. name = repo name in org (defaults to source_repo)."
   type = list(object({

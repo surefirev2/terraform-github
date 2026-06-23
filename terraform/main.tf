@@ -147,3 +147,22 @@ resource "github_repository" "repos" {
     ]
   }
 }
+
+resource "github_repository_collaborator" "collaborators" {
+  for_each = {
+    for pair in flatten([
+      for repo_key, users in var.repository_collaborators : [
+        for user in users : {
+          key        = "${repo_key}:${user.username}"
+          repo_key   = repo_key
+          username   = user.username
+          permission = user.permission
+        }
+      ]
+    ]) : pair.key => pair
+  }
+
+  repository = github_repository.repos[each.value.repo_key].name
+  username   = each.value.username
+  permission = each.value.permission
+}
