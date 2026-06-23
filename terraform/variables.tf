@@ -154,6 +154,15 @@ variable "repositories" {
         repository = "template-cursor"
       }
     }
+    "math-desktop" = {
+      name        = "math-desktop"
+      description = "Epiphanie math desktop app"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = ""
+      }
+    }
     "private_ai" = {
       name        = "private_ai"
       description = "TBD"
@@ -231,6 +240,30 @@ variable "repository_settings" {
     has_issues   = false
     has_projects = false
     has_wiki     = false
+  }
+}
+
+variable "branch_protection_status_checks" {
+  description = "Required status check contexts per repository key (defaults to pre-commit when absent)"
+  type        = map(list(string))
+  default = {
+    hockeymind = ["e2e (blacksmith-4vcpu-ubuntu-2404, 22)"]
+  }
+}
+
+variable "repository_collaborators" {
+  description = "Outside collaborators per repository (keys must match var.repositories)"
+  type = map(list(object({
+    username   = string
+    permission = string # pull, triage, push, maintain, admin
+  })))
+  default = {
+    math_spike2 = [
+      {
+        username   = "kevinwm0"
+        permission = "maintain"
+      }
+    ]
   }
 }
 

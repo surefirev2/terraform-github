@@ -102,7 +102,7 @@ resource "github_branch_protection" "default_branch" {
 
   required_status_checks {
     strict   = true
-    contexts = ["pre-commit"]
+    contexts = lookup(var.branch_protection_status_checks, each.key, ["pre-commit"])
   }
 
   enforce_admins = true
@@ -146,4 +146,23 @@ resource "github_repository" "repos" {
       security_and_analysis,
     ]
   }
+}
+
+resource "github_repository_collaborator" "collaborators" {
+  for_each = {
+    for pair in flatten([
+      for repo_key, users in var.repository_collaborators : [
+        for user in users : {
+          key        = "${repo_key}:${user.username}"
+          repo_key   = repo_key
+          username   = user.username
+          permission = user.permission
+        }
+      ]
+    ]) : pair.key => pair
+  }
+
+  repository = github_repository.repos[each.value.repo_key].name
+  username   = each.value.username
+  permission = each.value.permission
 }
