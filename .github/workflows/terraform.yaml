@@ -28,7 +28,7 @@ jobs:
     steps:
       # --- Bootstrap ---
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Ensure scripts are executable
         run: chmod +x .github/scripts/*.sh
