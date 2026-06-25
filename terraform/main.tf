@@ -145,16 +145,18 @@ resource "github_repository" "repos" {
   allow_update_branch    = true
   delete_branch_on_merge = true
 
-  # Skip reading vulnerability_alerts so plan/apply works when the token or org
-  # cannot access the endpoint (403: Resource not accessible by integration).
-  # We do not manage vulnerability_alerts; lifecycle.ignore_changes already
-  # ignores drift for vulnerability_alerts and security_and_analysis.
+  # Org does not subscribe to GitHub Advanced Security (GHAS). Skip reading
+  # vulnerability_alerts (403 without the right token scope) and ignore all
+  # security-related attributes so provider 5.45+ does not PATCH repos with
+  # Advanced Security fields (422 on private repos without GHAS).
   ignore_vulnerability_alerts_during_read = true
 
   lifecycle {
     ignore_changes = [
       vulnerability_alerts,
       security_and_analysis,
+      web_commit_signoff_required,
+      topics,
     ]
   }
 }
