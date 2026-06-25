@@ -49,4 +49,6 @@ If init fails with `HeadObject` / `403 Forbidden` on the state object, the IAM p
 
 After `make init` succeeds against S3, run [`scripts/terraform-import-existing.sh`](scripts/terraform-import-existing.sh) with `.env` loaded. It imports repositories, applies `null_resource.fork` for the fork, then imports branch protections. The fork repo’s default branch is **`master`** (not `main`); override with `FORK_DEFAULT_BRANCH=...` if needed.
 
-If drift remains (e.g. `ignore_vulnerability_alerts_during_read`), run `make apply` once to sync, then `make plan` should report **No changes**.
+If drift remains after import, run `make apply` once to sync, then `make plan` should report **No changes**.
+
+This org does not use GitHub Advanced Security (GHAS). Repository resources ignore `security_and_analysis`, `vulnerability_alerts`, and other provider 5.45+ attributes that would otherwise trigger PATCHes GitHub rejects on private repos without GHAS.
