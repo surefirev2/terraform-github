@@ -267,6 +267,22 @@ variable "repository_collaborators" {
   }
 }
 
+variable "repository_pages" {
+  description = "GitHub Pages settings per repository (keys must match var.repositories)"
+  type = map(object({
+    build_type    = string # legacy or workflow
+    source_branch = optional(string, "main")
+    source_path   = optional(string, "/")
+  }))
+  default = {
+    math_spike2 = {
+      build_type    = "workflow"
+      source_branch = "main"
+      source_path   = "/"
+    }
+  }
+}
+
 variable "repository_forks" {
   description = "Repositories to fork into the organization. name = repo name in org (defaults to source_repo)."
   type = list(object({

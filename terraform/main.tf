@@ -11,7 +11,7 @@ terraform {
   required_providers {
     github = {
       source  = "integrations/github"
-      version = "< 5.15.0"
+      version = "~> 5.45.0"
     }
     local = {
       source  = "hashicorp/local"
@@ -122,6 +122,17 @@ resource "github_repository" "repos" {
     content {
       owner      = "surefirev2"
       repository = template.value.repository
+    }
+  }
+
+  dynamic "pages" {
+    for_each = contains(keys(var.repository_pages), each.key) ? [var.repository_pages[each.key]] : []
+    content {
+      build_type = pages.value.build_type
+      source {
+        branch = pages.value.source_branch
+        path   = pages.value.source_path
+      }
     }
   }
 
