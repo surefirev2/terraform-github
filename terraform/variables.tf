@@ -226,6 +226,15 @@ variable "repositories" {
         repository = "template_template"
       }
     }
+    "revive" = {
+      name        = "revive"
+      description = "TBD"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-cursor"
+      }
+    }
   }
 }
 
