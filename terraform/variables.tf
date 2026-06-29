@@ -280,6 +280,11 @@ variable "repository_pages" {
       source_branch = "main"
       source_path   = "/"
     }
+    "math-desktop" = {
+      build_type    = "workflow"
+      source_branch = "main"
+      source_path   = "/"
+    }
   }
 }
 
