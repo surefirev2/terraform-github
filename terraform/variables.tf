@@ -246,7 +246,7 @@ variable "repository_settings" {
     has_wiki     = bool
   })
   default = {
-    has_issues   = false
+    has_issues   = true
     has_projects = false
     has_wiki     = false
   }
