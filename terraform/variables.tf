@@ -235,6 +235,15 @@ variable "repositories" {
         repository = "template-cursor"
       }
     }
+    "epiphanie-gitmcp" = {
+      name        = "epiphanie-gitmcp"
+      description = "TBD"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-template"
+      }
+    }
   }
 }
 
