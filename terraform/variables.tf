@@ -235,6 +235,15 @@ variable "repositories" {
         repository = "template-cursor"
       }
     }
+    "epiphanie-gitmcp" = {
+      name        = "epiphanie-gitmcp"
+      description = "TBD"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-template"
+      }
+    }
   }
 }
 
@@ -256,7 +265,7 @@ variable "branch_protection_status_checks" {
   description = "Required status check contexts per repository key (defaults to pre-commit when absent)"
   type        = map(list(string))
   default = {
-    hockeymind = ["e2e (blacksmith-4vcpu-ubuntu-2404, 22)"]
+    hockeymind = ["e2e"]
   }
 }
 
