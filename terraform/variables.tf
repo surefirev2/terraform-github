@@ -244,6 +244,15 @@ variable "repositories" {
         repository = "template-template"
       }
     }
+    "oatutor-content" = {
+      name        = "oatutor-content"
+      description = "OATutor content repository"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-template"
+      }
+    }
   }
 }
 
