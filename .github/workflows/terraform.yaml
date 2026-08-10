@@ -47,7 +47,7 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - name: Cache Docker layers
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
@@ -74,7 +74,7 @@ jobs:
 
       # --- Init for plan (providers in workspace for wait-unlock script) ---
       - name: Restore lock cache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         id: lock-cache
         with:
           path: .terraform-lock-cache
@@ -125,7 +125,7 @@ jobs:
 
       - name: Save lock cache
         if: always()
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: .terraform-lock-cache
           key: terraform-stale-lock-${{ github.repository }}
