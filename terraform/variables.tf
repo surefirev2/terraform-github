@@ -247,6 +247,15 @@ variable "repositories" {
     "oatutor-content" = {
       name        = "oatutor-content"
       description = "OATutor content repository"
+      visibility  = "public"
+      is_template = false
+      template = {
+        repository = "template-template"
+      }
+    }
+    "theseus" = {
+      name        = "theseus"
+      description = "Theseus"
       visibility  = "private"
       is_template = false
       template = {

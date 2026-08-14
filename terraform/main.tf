@@ -90,12 +90,12 @@ resource "github_branch_protection" "forked_default_branch" {
   enforce_admins = true
 }
 
-# Default branch (main); non-private repos plus hockeymind.
+# Default branch (main) for non-private repos except oatutor-content.
 resource "github_branch_protection" "default_branch" {
-  for_each = merge(
-    { for k, v in var.repositories : k => v if v.visibility != "private" },
-    { hockeymind = var.repositories["hockeymind"] }
-  )
+  for_each = {
+    for k, v in var.repositories : k => v
+    if v.visibility != "private" && k != "oatutor-content"
+  }
 
   repository_id = github_repository.repos[each.key].node_id
   pattern       = "main"
