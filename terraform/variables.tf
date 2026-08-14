@@ -247,7 +247,7 @@ variable "repositories" {
     "oatutor-content" = {
       name        = "oatutor-content"
       description = "OATutor content repository"
-      visibility  = "private"
+      visibility  = "public"
       is_template = false
       template = {
         repository = "template-template"
