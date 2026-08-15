@@ -262,6 +262,15 @@ variable "repositories" {
         repository = "template-template"
       }
     }
+    "barn-league-hockey" = {
+      name        = "barn-league-hockey"
+      description = "Barn League Hockey"
+      visibility  = "public"
+      is_template = false
+      template = {
+        repository = "template-template"
+      }
+    }
   }
 }
 
