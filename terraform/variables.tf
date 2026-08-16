@@ -271,6 +271,24 @@ variable "repositories" {
         repository = "template-template"
       }
     }
+    "skills" = {
+      name        = "skills"
+      description = "Skills"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = ""
+      }
+    }
+    "hermes" = {
+      name        = "hermes"
+      description = "Hermes"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = ""
+      }
+    }
   }
 }
 
