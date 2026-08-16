@@ -289,6 +289,15 @@ variable "repositories" {
         repository = ""
       }
     }
+    "github" = {
+      name        = "github"
+      description = "Org automation hub (workflow distribution via repo-sync-action)"
+      visibility  = "public"
+      is_template = false
+      template = {
+        repository = ""
+      }
+    }
   }
 }
 
@@ -311,6 +320,8 @@ variable "branch_protection_status_checks" {
   type        = map(list(string))
   default = {
     hockeymind = ["e2e"]
+    # Empty during hub bootstrap so initial content can land without a pre-commit check yet.
+    github = []
   }
 }
 
