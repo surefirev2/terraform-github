@@ -289,6 +289,15 @@ variable "repositories" {
         repository = ""
       }
     }
+    "custos" = {
+      name        = "custos"
+      description = "Custos repository (no template)"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = ""
+      }
+    }
     "github" = {
       name        = "github"
       description = "Org automation hub (workflow distribution via repo-sync-action)"
