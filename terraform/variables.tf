@@ -330,7 +330,7 @@ variable "branch_protection_status_checks" {
   default = {
     hockeymind = ["e2e"]
     # Empty during hub bootstrap so initial content can land without a pre-commit check yet.
-    github               = []
+    github               = ["automerge-gate/all-passed"]
     "barn-league-hockey" = ["automerge-gate/all-passed"]
   }
 }
