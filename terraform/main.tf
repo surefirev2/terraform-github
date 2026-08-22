@@ -68,6 +68,32 @@ resource "null_resource" "fork" {
   }
 }
 
+# Enable auto-merge on forked repositories (data sources only; not managed by github_repository).
+resource "null_resource" "fork_auto_merge" {
+  for_each = { for f in var.repository_forks : coalesce(f.name, f.source_repo) => f }
+
+  triggers = {
+    name = coalesce(each.value.name, each.value.source_repo)
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -e
+      TARGET_NAME="${coalesce(each.value.name, each.value.source_repo)}"
+      AUTH="Authorization: token $GITHUB_TOKEN"
+      ACCEPT="Accept: application/vnd.github.v3+json"
+      curl -sSf -X PATCH -H "$AUTH" -H "$ACCEPT" -H "Content-Type: application/json" \
+        -d '{"allow_auto_merge":true}' \
+        "https://api.github.com/repos/surefirev2/$TARGET_NAME" >/dev/null
+    EOT
+    environment = {
+      GITHUB_TOKEN = var.github_token
+    }
+  }
+
+  depends_on = [null_resource.fork]
+}
+
 # Look up forked repos so we can apply branch protection (after fork exists)
 data "github_repository" "forked" {
   for_each   = { for f in var.repository_forks : coalesce(f.name, f.source_repo) => f }
