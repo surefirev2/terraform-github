@@ -334,13 +334,12 @@ variable "repository_settings" {
 }
 
 variable "branch_protection_status_checks" {
-  description = "Required status check contexts per repository key (defaults to pre-commit when absent)"
+  description = "Required status check contexts per repository key (defaults to pre-commit when absent). Private repos listed here are also opted into main branch protection."
   type        = map(list(string))
   default = {
-    hockeymind = ["e2e"]
-    # Empty during hub bootstrap so initial content can land without a pre-commit check yet.
     github               = ["automerge-gate/all-passed"]
     "barn-league-hockey" = ["automerge-gate/all-passed"]
+    "surefire-dms"       = ["automerge-gate/all-passed"]
   }
 }
 
