@@ -163,6 +163,15 @@ variable "repositories" {
         repository = ""
       }
     }
+    "surefire-dms" = {
+      name        = "surefire-dms"
+      description = "Surefire DMS"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = ""
+      }
+    }
     "private_ai" = {
       name        = "private_ai"
       description = "TBD"
@@ -365,6 +374,11 @@ variable "repository_pages" {
       source_path   = "/"
     }
     "math-desktop" = {
+      build_type    = "workflow"
+      source_branch = "main"
+      source_path   = "/"
+    }
+    "surefire-dms" = {
       build_type    = "workflow"
       source_branch = "main"
       source_path   = "/"
