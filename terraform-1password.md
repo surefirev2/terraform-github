@@ -32,9 +32,15 @@ The IAM user or role whose keys are in 1Password needs S3 permissions on the sta
 
 Exact ARNs depend on your bucket and key prefix; have IAM reviewed for your org. If you scope `ListBucket` by `s3:prefix`, the prefix must cover the state **key** in [`terraform/main.tf`](terraform/main.tf) (e.g. another repo’s policy for `template-1-terraform` alone will deny `terraform-github`).
 
+## Apply policy (required)
+
+**Applies run only via CI after a PR merges to `main`.** Do not run `make apply` or `terraform apply` locally (humans or agents). Use `make plan` / `make validate` locally; open a PR so [`.github/workflows/terraform.yaml`](.github/workflows/terraform.yaml) plans on the PR and applies on merge. See [`AGENTS.md`](AGENTS.md) and [`.github/docs/TERRAFORM_CI_DESIGN.md`](.github/docs/TERRAFORM_CI_DESIGN.md).
+
+(`make apply` remains in the Makefile for the CI apply job / unlock-retry scripts — not for local use.)
+
 ## Local `.env`
 
-For local runs, either:
+For local **plan/validate/import** runs, either:
 
 1. Export `OP_SERVICE_ACCOUNT_TOKEN`, `TF_GITHUB_ORG`, `TF_GITHUB_REPO` and run `.github/scripts/terraform-load-env.sh`, or
 2. Maintain a root `.env` (not committed) with the same variables CI would produce, including `AWS_*` and `TF_VAR_github_token`.
@@ -49,6 +55,6 @@ If init fails with `HeadObject` / `403 Forbidden` on the state object, the IAM p
 
 After `make init` succeeds against S3, run [`scripts/terraform-import-existing.sh`](scripts/terraform-import-existing.sh) with `.env` loaded. It imports repositories, applies `null_resource.fork` for the fork, then imports branch protections. The fork repo’s default branch is **`master`** (not `main`); override with `FORK_DEFAULT_BRANCH=...` if needed.
 
-If drift remains after import, run `make apply` once to sync, then `make plan` should report **No changes**.
+If drift remains after import, commit the matching config on a feature branch, open a PR, and let CI apply on merge to `main`. Then `make plan` (or the PR plan) should report **No changes**.
 
 This org does not use GitHub Advanced Security (GHAS). Repository resources ignore `security_and_analysis`, `vulnerability_alerts`, and other provider 5.45+ attributes that would otherwise trigger PATCHes GitHub rejects on private repos without GHAS.
