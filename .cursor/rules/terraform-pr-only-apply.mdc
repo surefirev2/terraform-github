@@ -1,0 +1,11 @@
+---
+description: Terraform apply only via PR merge to main (CI); never local make apply
+alwaysApply: true
+---
+
+# Terraform apply: PR / CI only
+
+- **Never** run `make apply` or `terraform apply` locally in this repo (including “just this one resource”, localhost, or after a successful plan).
+- Ship config on a **feature branch**, open a **PR**, let CI post the plan, and **merge to `main`** so [`.github/workflows/terraform.yaml`](mdc:.github/workflows/terraform.yaml) applies.
+- Local `make plan` / `make validate` / imports that prepare state are fine; the apply itself must go through CI after merge.
+- See [AGENTS.md](mdc:AGENTS.md) and [TERRAFORM_CI_DESIGN.md](mdc:.github/docs/TERRAFORM_CI_DESIGN.md).

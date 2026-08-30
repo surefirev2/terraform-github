@@ -116,11 +116,14 @@ resource "github_branch_protection" "forked_default_branch" {
   enforce_admins = true
 }
 
-# Default branch (main) for non-private repos except oatutor-content.
+# Default branch (main): all non-private repos except oatutor-content, plus private
+# repos opted in via var.branch_protection_status_checks.
 resource "github_branch_protection" "default_branch" {
   for_each = {
     for k, v in var.repositories : k => v
-    if v.visibility != "private" && k != "oatutor-content"
+    if k != "oatutor-content" && (
+      v.visibility != "private" || contains(keys(var.branch_protection_status_checks), k)
+    )
   }
 
   repository_id = github_repository.repos[each.key].node_id
