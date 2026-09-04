@@ -350,6 +350,7 @@ variable "branch_protection_status_checks" {
     github               = ["automerge-gate/all-passed"]
     "barn-league-hockey" = ["automerge-gate/all-passed"]
     "surefire-dms"       = ["automerge-gate/all-passed"]
+    "Meadowkin"          = ["automerge-gate/all-passed"]
   }
 }
 
