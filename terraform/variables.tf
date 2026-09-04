@@ -316,6 +316,15 @@ variable "repositories" {
         repository = ""
       }
     }
+    "Meadowkin" = {
+      name        = "Meadowkin"
+      description = "Meadowkin"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = ""
+      }
+    }
   }
 }
 
