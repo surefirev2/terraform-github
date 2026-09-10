@@ -351,6 +351,7 @@ variable "branch_protection_status_checks" {
     "barn-league-hockey" = ["automerge-gate/all-passed"]
     "surefire-dms"       = ["automerge-gate/all-passed"]
     "Meadowkin"          = ["automerge-gate/all-passed"]
+    revive               = ["automerge-gate/all-passed"]
   }
 }
 
