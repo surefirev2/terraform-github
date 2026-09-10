@@ -1,5 +1,5 @@
 # Dockerfile
-FROM hashicorp/terraform:1.16.1
+FROM hashicorp/terraform:1.16.2
 
 # curl required for null_resource.fork local-exec (GitHub API fork/rename)
 RUN apk add --no-cache curl
