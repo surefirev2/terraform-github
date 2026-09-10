@@ -2,6 +2,8 @@
 # Import existing GitHub resources into S3-backed state (integrations/github ~5.14).
 # Order: repositories -> null_resource.fork (targeted apply) -> branch protections.
 # Prerequisites: .env with TF_VAR_github_token and AWS_* ; make init succeeded.
+# After import, ship remaining config via PR; CI applies on merge to main (no local make apply).
+# See AGENTS.md and .github/docs/TERRAFORM_CI_DESIGN.md.
 set -euo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
@@ -62,4 +64,4 @@ BRANCH="${FORK_DEFAULT_BRANCH:-master}"
 echo "==> import github_branch_protection.forked_default_branch[\"${FORK_KEY}\"] ${FORK_REPO}:${BRANCH}"
 run_tf import "github_branch_protection.forked_default_branch[\"${FORK_KEY}\"]" "${FORK_REPO}:${BRANCH}"
 
-echo "Imports complete. Run: make plan"
+echo "Imports complete. Run: make plan (local). Apply only via PR merge → CI on main."

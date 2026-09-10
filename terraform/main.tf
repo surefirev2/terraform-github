@@ -11,7 +11,7 @@ terraform {
   required_providers {
     github = {
       source  = "integrations/github"
-      version = "< 5.15.0"
+      version = "~> 5.45.0"
     }
     local = {
       source  = "hashicorp/local"
@@ -68,6 +68,32 @@ resource "null_resource" "fork" {
   }
 }
 
+# Enable auto-merge on forked repositories (data sources only; not managed by github_repository).
+resource "null_resource" "fork_auto_merge" {
+  for_each = { for f in var.repository_forks : coalesce(f.name, f.source_repo) => f }
+
+  triggers = {
+    name = coalesce(each.value.name, each.value.source_repo)
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -e
+      TARGET_NAME="${coalesce(each.value.name, each.value.source_repo)}"
+      AUTH="Authorization: token $GITHUB_TOKEN"
+      ACCEPT="Accept: application/vnd.github.v3+json"
+      curl -sSf -X PATCH -H "$AUTH" -H "$ACCEPT" -H "Content-Type: application/json" \
+        -d '{"allow_auto_merge":true}' \
+        "https://api.github.com/repos/surefirev2/$TARGET_NAME" >/dev/null
+    EOT
+    environment = {
+      GITHUB_TOKEN = var.github_token
+    }
+  }
+
+  depends_on = [null_resource.fork]
+}
+
 # Look up forked repos so we can apply branch protection (after fork exists)
 data "github_repository" "forked" {
   for_each   = { for f in var.repository_forks : coalesce(f.name, f.source_repo) => f }
@@ -90,12 +116,15 @@ resource "github_branch_protection" "forked_default_branch" {
   enforce_admins = true
 }
 
-# Default branch (main); non-private repos plus hockeymind.
+# Default branch (main): all non-private repos except oatutor-content, plus private
+# repos opted in via var.branch_protection_status_checks.
 resource "github_branch_protection" "default_branch" {
-  for_each = merge(
-    { for k, v in var.repositories : k => v if v.visibility != "private" },
-    { hockeymind = var.repositories["hockeymind"] }
-  )
+  for_each = {
+    for k, v in var.repositories : k => v
+    if k != "oatutor-content" && (
+      v.visibility != "private" || contains(keys(var.branch_protection_status_checks), k)
+    )
+  }
 
   repository_id = github_repository.repos[each.key].node_id
   pattern       = "main"
@@ -125,6 +154,17 @@ resource "github_repository" "repos" {
     }
   }
 
+  dynamic "pages" {
+    for_each = contains(keys(var.repository_pages), each.key) ? [var.repository_pages[each.key]] : []
+    content {
+      build_type = pages.value.build_type
+      source {
+        branch = pages.value.source_branch
+        path   = pages.value.source_path
+      }
+    }
+  }
+
   has_issues   = var.repository_settings.has_issues
   has_projects = var.repository_settings.has_projects
   has_wiki     = var.repository_settings.has_wiki
@@ -134,16 +174,18 @@ resource "github_repository" "repos" {
   allow_update_branch    = true
   delete_branch_on_merge = true
 
-  # Skip reading vulnerability_alerts so plan/apply works when the token or org
-  # cannot access the endpoint (403: Resource not accessible by integration).
-  # We do not manage vulnerability_alerts; lifecycle.ignore_changes already
-  # ignores drift for vulnerability_alerts and security_and_analysis.
+  # Org does not subscribe to GitHub Advanced Security (GHAS). Skip reading
+  # vulnerability_alerts (403 without the right token scope) and ignore all
+  # security-related attributes so provider 5.45+ does not PATCH repos with
+  # Advanced Security fields (422 on private repos without GHAS).
   ignore_vulnerability_alerts_during_read = true
 
   lifecycle {
     ignore_changes = [
       vulnerability_alerts,
       security_and_analysis,
+      web_commit_signoff_required,
+      topics,
     ]
   }
 }

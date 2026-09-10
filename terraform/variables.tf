@@ -163,6 +163,15 @@ variable "repositories" {
         repository = ""
       }
     }
+    "surefire-dms" = {
+      name        = "surefire-dms"
+      description = "Surefire DMS"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = ""
+      }
+    }
     "private_ai" = {
       name        = "private_ai"
       description = "TBD"
@@ -226,6 +235,96 @@ variable "repositories" {
         repository = "template_template"
       }
     }
+    "revive" = {
+      name        = "revive"
+      description = "TBD"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-cursor"
+      }
+    }
+    "epiphanie-gitmcp" = {
+      name        = "epiphanie-gitmcp"
+      description = "TBD"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-template"
+      }
+    }
+    "oatutor-content" = {
+      name        = "oatutor-content"
+      description = "OATutor content repository"
+      visibility  = "public"
+      is_template = false
+      template = {
+        repository = "template-template"
+      }
+    }
+    "theseus" = {
+      name        = "theseus"
+      description = "Theseus"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = "template-template"
+      }
+    }
+    "barn-league-hockey" = {
+      name        = "barn-league-hockey"
+      description = "Barn League Hockey"
+      visibility  = "public"
+      is_template = false
+      template = {
+        repository = "template-template"
+      }
+    }
+    "skills" = {
+      name        = "skills"
+      description = "Skills"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = ""
+      }
+    }
+    "hermes" = {
+      name        = "hermes"
+      description = "Hermes"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = ""
+      }
+    }
+    "custos" = {
+      name        = "custos"
+      description = "Custos repository (no template)"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = ""
+      }
+    }
+    "github" = {
+      name        = "github"
+      description = "Org automation hub (workflow distribution via repo-sync-action)"
+      visibility  = "public"
+      is_template = false
+      template = {
+        repository = ""
+      }
+    }
+    "Meadowkin" = {
+      name        = "Meadowkin"
+      description = "Meadowkin"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = ""
+      }
+    }
   }
 }
 
@@ -237,17 +336,22 @@ variable "repository_settings" {
     has_wiki     = bool
   })
   default = {
-    has_issues   = false
+    has_issues   = true
     has_projects = false
     has_wiki     = false
   }
 }
 
 variable "branch_protection_status_checks" {
-  description = "Required status check contexts per repository key (defaults to pre-commit when absent)"
+  description = "Required status check contexts per repository key (defaults to pre-commit when absent). Private repos listed here are also opted into main branch protection."
   type        = map(list(string))
   default = {
-    hockeymind = ["e2e (blacksmith-4vcpu-ubuntu-2404, 22)"]
+    hockeymind           = ["automerge-gate/all-passed"]
+    github               = ["automerge-gate/all-passed"]
+    "barn-league-hockey" = ["automerge-gate/all-passed"]
+    "surefire-dms"       = ["automerge-gate/all-passed"]
+    "Meadowkin"          = ["automerge-gate/all-passed"]
+    revive               = ["automerge-gate/all-passed"]
   }
 }
 
@@ -264,6 +368,32 @@ variable "repository_collaborators" {
         permission = "maintain"
       }
     ]
+  }
+}
+
+variable "repository_pages" {
+  description = "GitHub Pages settings per repository (keys must match var.repositories)"
+  type = map(object({
+    build_type    = string # legacy or workflow
+    source_branch = optional(string, "main")
+    source_path   = optional(string, "/")
+  }))
+  default = {
+    math_spike2 = {
+      build_type    = "workflow"
+      source_branch = "main"
+      source_path   = "/"
+    }
+    "math-desktop" = {
+      build_type    = "workflow"
+      source_branch = "main"
+      source_path   = "/"
+    }
+    "surefire-dms" = {
+      build_type    = "workflow"
+      source_branch = "main"
+      source_path   = "/"
+    }
   }
 }
 
