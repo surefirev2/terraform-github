@@ -325,6 +325,15 @@ variable "repositories" {
         repository = ""
       }
     }
+    "shawn-birthday" = {
+      name        = "shawn-birthday"
+      description = "Shawn Birthday"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = ""
+      }
+    }
   }
 }
 
