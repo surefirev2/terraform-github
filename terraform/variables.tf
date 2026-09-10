@@ -399,15 +399,21 @@ variable "repository_pages" {
 variable "repository_forks" {
   description = "Repositories to fork into the organization. name = repo name in org (defaults to source_repo)."
   type = list(object({
-    source_owner = string
-    source_repo  = string
-    name         = optional(string) # name in org; default source_repo
+    source_owner  = string
+    source_repo   = string
+    name          = optional(string) # name in org; default source_repo
+    status_checks = optional(list(string), ["pre-commit"])
   }))
   default = [
     {
       source_owner = "Th0rgal"
       source_repo  = "open-ralph-wiggum"
       name         = "ralph-taskmaster-ai"
+    },
+    {
+      source_owner  = "clay-good"
+      source_repo   = "OpenLore"
+      status_checks = ["automerge-gate/all-passed"]
     }
   ]
 }

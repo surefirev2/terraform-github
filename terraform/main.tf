@@ -110,7 +110,7 @@ resource "github_branch_protection" "forked_default_branch" {
 
   required_status_checks {
     strict   = true
-    contexts = ["pre-commit"]
+    contexts = each.value.status_checks
   }
 
   enforce_admins = true
