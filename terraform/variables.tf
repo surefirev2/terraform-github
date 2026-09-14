@@ -181,8 +181,8 @@ variable "repositories" {
         repository = "template-cursor"
       }
     }
-    "terraform-cloudflare" = {
-      name        = "terraform-cloudflare"
+    "terraform-cloudflare-surefire" = {
+      name        = "terraform-cloudflare-surefire"
       description = "Terraform configuration for Cloudflare"
       visibility  = "private"
       is_template = false
