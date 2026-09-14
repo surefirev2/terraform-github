@@ -325,6 +325,15 @@ variable "repositories" {
         repository = ""
       }
     }
+    "ai-blender-workflow" = {
+      name        = "ai-blender-workflow"
+      description = "AI → Blender workflow: GPT-6 Astra creates game assets via Blender Lab MCP bridge"
+      visibility  = "private"
+      is_template = false
+      template = {
+        repository = ""
+      }
+    }
   }
 }
 
