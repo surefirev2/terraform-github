@@ -355,13 +355,14 @@ variable "branch_protection_status_checks" {
   description = "Required status check contexts per repository key (defaults to pre-commit when absent). Private repos listed here are also opted into main branch protection."
   type        = map(list(string))
   default = {
-    hockeymind           = ["automerge-gate/all-passed"]
-    github               = ["automerge-gate/all-passed"]
-    "barn-league-hockey" = ["automerge-gate/all-passed"]
-    "math-desktop"       = ["automerge-gate/all-passed"]
-    "surefire-dms"       = ["automerge-gate/all-passed"]
-    "Meadowkin"          = ["automerge-gate/all-passed"]
-    revive               = ["automerge-gate/all-passed"]
+    hockeymind                      = ["automerge-gate/all-passed"]
+    github                          = ["automerge-gate/all-passed"]
+    "barn-league-hockey"            = ["automerge-gate/all-passed"]
+    "math-desktop"                  = ["automerge-gate/all-passed"]
+    "surefire-dms"                  = ["automerge-gate/all-passed"]
+    "terraform-cloudflare-surefire" = ["automerge-gate/all-passed"]
+    "Meadowkin"                     = ["automerge-gate/all-passed"]
+    revive                          = ["automerge-gate/all-passed"]
   }
 }
 
