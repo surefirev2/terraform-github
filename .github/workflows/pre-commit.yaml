@@ -16,7 +16,7 @@ jobs:
       contents: read
     steps:
     - run: echo "$github.actor"
-    - uses: amannn/action-semantic-pull-request@v6.1.1
+    - uses: amannn/action-semantic-pull-request@v6.1.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   pre-commit:
